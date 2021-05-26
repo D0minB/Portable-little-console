@@ -3,4 +3,4 @@
  
  Dominik Bogielczyk \
  Szymon Murawski \
- Kacper Sobczak
+ Kacper Sobczak \

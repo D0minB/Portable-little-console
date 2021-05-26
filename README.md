@@ -1,6 +1,6 @@
 # Portable little console
- KN RAI project
+# KN RAI project
  
  Dominik Bogielczyk \
  Szymon Murawski \
- Kacper Sobczak \
+ Kacper Sobczak

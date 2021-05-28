@@ -1,4 +1,5 @@
 import pygame
+import time
 
 class Maze(pygame.Rect):
     def __init__(self, screen,width,color):
@@ -9,9 +10,9 @@ class Maze(pygame.Rect):
         self.color_=new_color
     def draw_level_1(self):
         pygame.draw.line(self.screen_, self.color_,
-                         (10, 255), (10, 200), self.width_)
+                         (10, 320), (10, 200), self.width_)
         pygame.draw.line(self.screen_, self.color_,
-                         (30, 255), (30, 220), self.width_)
+                         (30, 320), (30, 220), self.width_)
         pygame.draw.line(self.screen_, self.color_,
                          (30, 220), (150, 220), self.width_)
         pygame.draw.line(self.screen_, self.color_,
@@ -60,6 +61,7 @@ class Maze(pygame.Rect):
                          (280, 80), (280, 50), self.width_)
         pygame.draw.line(self.screen_, self.color_,
                          (400, 80), (400, 50), self.width_)
+        pygame.draw.rect(self.screen_, (255, 255, 255), [330, 0, 20, 10])
 
 
 

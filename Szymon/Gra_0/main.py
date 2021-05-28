@@ -14,6 +14,8 @@ fps = 10.0
 dx=0
 dy=0
 dt=0
+dlugosc=0
+szerokosc=0
 
 running = True
 while running:
@@ -27,22 +29,30 @@ while running:
 
     screen.fill((0, 0, 0))
     maze.draw_level_1()
+
+    dx=0
+    dy=0
     if pygame.key.get_pressed()[pygame.K_LEFT]:
-        dx=0
         dx -= 4
-        player.move(dx,0)
     if pygame.key.get_pressed()[pygame.K_RIGHT]:
-        dx=0
         dx += 4
-        player.move(dx,0)
     if pygame.key.get_pressed()[pygame.K_UP]:
-        dy=0
         dy -= 4
-        player.move(0,dy)
     if pygame.key.get_pressed()[pygame.K_DOWN]:
-        dy=0
         dy += 4
-        player.move(0,dy)
+    player.move(dx,dy)
+    for linia in maze.linie:
+        if linia[0]==linia[2]:
+            dlugosc=abs(linia[3]-linia[1])
+            szerokosc=2
+        if linia[1]==linia[3]:
+            szerokosc=abs(linia[2]-linia[0])
+            dlugosc=2
+        if pygame.Rect(player.x_, player.y_, 6, 6).colliderect(pygame.Rect(linia[0], linia[1], szerokosc, dlugosc)) == True:
+            player.x_=16
+            player.y_=310
+
+
     player.draw()
     pygame.display.update()
     pygame.display.flip()

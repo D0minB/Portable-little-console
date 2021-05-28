@@ -1,23 +1,5 @@
 import pygame
 import time
-# class Player(pygame.Rect):
-#     def __init__(self,screen,color):
-#         self.screen_ = screen
-#         self.color_ = color
-#         self.pos_x_start_=20
-#         self.pos_y_start_=255
-#         self.pos_x_
-#         self.pos_y_
-#         self.fps=10
-#
-#     def set_color(self,new_color):
-#         self.color_=new_color
-#     def move(self,sreen,):
-#         if pygame.key.get_pressed()[pygame.K_LEFT]:
-#             self.pos_x_ -= int(150 / self.fps)
-#         if pygame.key.get_pressed()[pygame.K_RIGHT]:
-#             self.pos_x_ += int(150 / self.fps)
-#         self.move(self.pos_x_)
 class Player(pygame.Rect):
 
     def __init__(self,screen):

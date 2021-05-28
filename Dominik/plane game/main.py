@@ -9,16 +9,16 @@ import numpy as np
 from plane_class import Plane
 
 pygame.init()
-screen = pygame.display.set_mode((480, 255))
+#screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+screen = pygame.display.set_mode((480, 320))
 pygame.display.set_caption('Portable little console')
-pygame.display.set_icon(pygame.image.load('logo.png'))
 
 font_style = pygame.font.SysFont("bahnschrift", 40)
 font_small = pygame.font.SysFont("bahnschrift", 15)
 
 def plane_game():
     dt = 0.0
-    fps = 10.0
+    fps = 20.0
     clock = pygame.time.Clock()
 
     plane = Plane(screen)
@@ -32,15 +32,15 @@ def plane_game():
     def targets_generating():
         new_targets_pos = []
         for i in range(random.randint(4, 7)):  # 6 TO 12 - NUMBER OF THE NEW TARGETS
-            n = random.randint(0, 15) #new target position choosing
+            n = random.randint(1, 14) #new target position choosing
 
             while n in new_targets_pos:  # ADD UNIQUE POSITION OF THE TARGET
-                n = random.randint(0, 15)
+                n = random.randint(1, 14)
 
             new_targets_pos.append(n)
 
         for target_pos in new_targets_pos:  # ADD UNIQUE TARGETS POSITIONS TO LIST
-            targets.append([target_pos * 22, 0])
+            targets.append([target_pos * 22 + 8, 8])
 
         return targets
 
@@ -108,13 +108,10 @@ def plane_game():
                         bullets.remove(bullet)
                         points+=1
 
-            #remove bullets and targets out of screen
+            #remove out of screen bullets
             for bullet in bullets_copy:
-                if bullet[1]<0:
+                if bullet[1]<15:
                     bullets.remove(bullet)
-            for target in targets_copy:
-                if target[1]>screen.get_height():
-                    targets.remove(target)
 
             [x,y]=plane.get_position()
 
@@ -142,14 +139,22 @@ def plane_game():
 
             plane.draw()
 
+            #frame
+            pygame.draw.line(screen, (255, 255, 255), (2, 2), (16*22 + 8, 2), 4)
+            pygame.draw.line(screen, (255, 255, 255), (2, screen.get_height()-2), (16 * 22 + 8, screen.get_height()-2), 4)
+            pygame.draw.line(screen, (255, 255, 255), (2, 2), (2, screen.get_height()-2), 4)
+            pygame.draw.line(screen,(255,255,255),(16*22 + 8,2),(16*22 + 8,screen.get_height()-2),4)
+
             for target in targets:
-                pygame.draw.rect(screen, (0, 255, 0),pygame.Rect(target[0],target[1],20,20))
+                pygame.draw.rect(screen, (255, 255, 0),pygame.Rect(target[0],target[1],20,20))
 
             for bullet in bullets:
-                pygame.draw.circle(screen, (255, 0, 0),[int(bullet[0]),int(bullet[1])],5)
+                pygame.draw.circle(screen, (255, 20, 0),[int(bullet[0]),int(bullet[1])],5)
 
-            text = font_style.render(str(points), True, (0, 200, 0))
+            text = font_style.render(str(points), True, (255, 255, 255))
             screen.blit(text, [screen.get_width() -75, screen.get_height()/2])
+            text2 = font_small.render("points", True, (255, 255, 255))
+            screen.blit(text2, [screen.get_width() - 75, screen.get_height() / 2 +50])
 
             pygame.display.flip()
 

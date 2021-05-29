@@ -48,7 +48,7 @@ class Maze(pygame.Rect):
     def set_color(self,new_color):
         self.color_=new_color
     def draw_level_1(self):
-     pygame.draw.rect(self.screen_, (255, 255, 255), [330, 0, 20, 10])
+
 
      for block in self.linie:
          pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)

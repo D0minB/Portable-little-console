@@ -2,6 +2,28 @@ import pygame as pg
 import sys
 from pygame.math import Vector2
 import random
+from spidev import SpiDev
+
+class MCP3008:
+    def __init__(self, bus=1, device=2):
+        self.bus, self.device = bus, device
+        self.spi = SpiDev()
+        self.open()
+        self.spi.max_speed_hz = 1000000  # 1MHz
+
+    def open(self):
+        self.spi.open(self.bus, self.device)
+        self.spi.max_speed_hz = 1000000  # 1MHz
+
+    def read(self, channel=0):
+        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
+        data = ((adc[1] & 3) << 8) + adc[2]
+        return data
+
+    def close(self):
+        self.spi.close()
+
+adc = MCP3008()
 
 class Rakieta(object):
 
@@ -10,33 +32,59 @@ class Rakieta(object):
         self.nr = nr
         self.width = 5
         self.lenght = 70
+        self.control = 500
         self.size = self.game.window.get_size()
         if nr == 1:
             self.pos = Vector2(0,self.size[1]/2-self.lenght/2)
         else:
             self.pos = Vector2(self.size[0]-self.width,self.size[1]/2-self.lenght/2)
-        self.vel = Vector2(0, 2)
+        self.vel = Vector2(0, 1.5)
         self.hitbox = pg.Rect(self.pos[0],self.pos[1],self.width,self.lenght)
 
     def tick(self):
-        pressed = pg.key.get_pressed()
         if self.nr == 1:
+            self.control = adc.read(channel=1)
             if self.hitbox.colliderect(self.game.UP_WALL):
                 self.pos = Vector2(0,5)
             if self.hitbox.colliderect(self.game.DOWN_WALL):
                 self.pos = Vector2(0,self.size[1]-5-self.lenght)
-            if pressed[pg.K_s]:
+            if self.control<450:
+                self.pos += 0.2*self.vel
+            if self.control<300:
+                self.pos += 0.4*self.vel
+            if self.control<200:
+                self.pos += 0.7*self.vel
+            if self.control<100:
                 self.pos += self.vel
-            if pressed[pg.K_w]:
+            if self.control > 550:
+                self.pos -= 0.2 * self.vel
+            if self.control > 750:
+                self.pos -= 0.4 * self.vel
+            if self.control > 950:
+                self.pos -= 0.7 * self.vel
+            if self.control > 1000:
                 self.pos -= self.vel
         else :
+            self.control = adc.read(channel=4)
             if self.hitbox.colliderect(self.game.UP_WALL):
                 self.pos = Vector2(self.size[0]-self.width,5)
             if self.hitbox.colliderect(self.game.DOWN_WALL):
                 self.pos = Vector2(self.size[0]-self.width,self.size[1]-5-self.lenght)
-            if pressed[pg.K_DOWN]:
+            if self.control < 450:
+                self.pos += 0.2 * self.vel
+            if self.control < 300:
+                self.pos += 0.4 * self.vel
+            if self.control < 200:
+                self.pos += 0.7 * self.vel
+            if self.control < 100:
                 self.pos += self.vel
-            if pressed[pg.K_UP]:
+            if self.control > 550:
+                self.pos -= 0.2 * self.vel
+            if self.control > 750:
+                self.pos -= 0.4 * self.vel
+            if self.control > 950:
+                self.pos -= 0.7 * self.vel
+            if self.control > 1000:
                 self.pos -= self.vel
 
     def draw(self):
@@ -55,7 +103,7 @@ class ball(object):
             self.direction = 1
         self.size = self.game.window.get_size()
         self.pos = Vector2(self.size[0]/2-self.diameter/2,self.size[1]/2-self.diameter/2)
-        self.vel = Vector2(1.5,1.5)
+        self.vel = Vector2(4,4)
         self.hitbox = pg.Rect(self.pos[0],self.pos[1],self.diameter,self.diameter)
 
     def tick(self):
@@ -79,19 +127,19 @@ class ball(object):
     def draw(self):
         self.hitbox = pg.Rect(self.pos[0],self.pos[1],self.diameter,self.diameter)
         #pg.draw.rect(self.game.window,(0,255,0),self.hitbox)
-        pg.draw.circle(self.game.window,(255,255,255),(self.pos[0]+self.diameter/2,self.pos[1]+self.diameter/2),self.diameter/2)
+        pg.draw.circle(self.game.window,(255,255,255),(int(self.pos[0])+int(self.diameter/2),int(self.pos[1])+int(self.diameter/2)),int(self.diameter/2))
 
 
 class Game(object):
 
     def __init__(self):
         #Config
-        self.maxFPS = 100.0
+        self.maxFPS = 20
 
         #Init
         pg.init()
         self.resolution = (480,320)
-        self.window = pg.display.set_mode(self.resolution)
+        self.window = pg.display.set_mode((0,0),pg.FULLSCREEN)
         self.FPSclock = pg.time.Clock()
         self.FPSdelta = 0.0
 

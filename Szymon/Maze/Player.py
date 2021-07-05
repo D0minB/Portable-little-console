@@ -6,16 +6,58 @@ class Player(pygame.Rect):
         self.x_=16
         self.y_=310
         self.screen_=screen
+        self.zycia=3
+        self.poziom=1
+
+
 
 
 
     def draw(self):
-        #for block in self.blocks:
             pygame.draw.rect(self.screen_, (255, 69, 0), pygame.Rect(self.x_,self.y_,6,6))
 
     def move(self,dx,dy):
-        #_blocks[0] - the middle block of plane
         if self.x_+dx-3>0 and self.x_+ dx+3 < 475 and self.y_+dy>0 and self.y_+dy<320:
                 self.x_+=dx
                 self.y_+=dy
+
+    def sterowanie(self,dx,dy):
+        dx = 0
+        dy = 0
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
+            dx -= 4
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            dx += 4
+        if pygame.key.get_pressed()[pygame.K_UP]:
+            dy -= 4
+        if pygame.key.get_pressed()[pygame.K_DOWN]:
+            dy += 4
+        self.move(dx, dy)
+
+    def kolizje(self, linie):
+        for linia in linie:
+            if linia[0] == linia[2]:
+                dlugosc = abs(linia[3] - linia[1])
+                szerokosc = 2
+            if linia[1] == linia[3]:
+                szerokosc = abs(linia[2] - linia[0])
+                dlugosc = 2
+            if pygame.Rect(self.x_, self.y_, 6, 6).colliderect(
+                    pygame.Rect(linia[0], linia[1], szerokosc, dlugosc)) == True:
+                self.x_ = 16
+                self.y_ = 310
+                self.zycia -= 1
+
+    def win(self,screen):
+        pygame.draw.rect(screen, (255, 255, 255), [332, 0, 18, 10])
+        if pygame.Rect(self.x_, self.y_, 6, 6).colliderect(pygame.Rect(332, 0, 18, 10)) == True:
+            self.x_ = 16
+            self.y_ = 310
+            self.poziom += 1
+
+    def napisy(self,screen,font_style):
+        text_zycia = font_style.render("Życia: " + str(self.zycia), True, (255, 0, 0))
+        screen.blit(text_zycia, [0, 0])
+        text_zycia = font_style.render("Poziom: " + str(self.poziom), True, (255, 0, 0))
+        screen.blit(text_zycia, [0, 20])
 

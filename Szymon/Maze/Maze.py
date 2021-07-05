@@ -2,11 +2,11 @@ import pygame
 import time
 
 class Maze(pygame.Rect):
-    def __init__(self, screen,width,color):
+    def __init__(self, screen,width):
         self.screen_ = screen
         self.linie=[]
         self.linie2=[]
-        self.color_=color
+        self.color_=(0,0,0)
         self.width_=width
 
         self.linie.append((10, 200,10,320))

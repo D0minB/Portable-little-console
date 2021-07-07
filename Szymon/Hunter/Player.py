@@ -9,11 +9,8 @@ class Player(pygame.sprite.Sprite):
         self.rect_=self.image_.get_rect()
         self.x_ = 240
         self.y_ = 160
-
-
-
-
-
+        self.zycia_=3
+        self.punkty_=0
 
     def draw(self):
         self.screen_.blit(self.image_, self.rect_)
@@ -38,3 +35,9 @@ class Player(pygame.sprite.Sprite):
         if pygame.key.get_pressed()[pygame.K_DOWN]:
             dy += 8
         self.move(dx, dy)
+
+    def napisy(self, screen, font_style):
+        text_zycia = font_style.render("Życia: " + str(self.zycia_), True, (255, 0, 0))
+        screen.blit(text_zycia, [0, 0])
+        text_zycia = font_style.render("Poziom: " + str(self.punkty_), True, (255, 0, 0))
+        screen.blit(text_zycia, [0, 20])

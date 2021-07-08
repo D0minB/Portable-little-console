@@ -11,6 +11,7 @@ class Player(pygame.sprite.Sprite):
         self.y_ = 160
         self.zycia_=3
         self.punkty_=0
+        self.counter_a=0
 
     def draw(self):
         self.screen_.blit(self.image_, self.rect_)
@@ -39,5 +40,5 @@ class Player(pygame.sprite.Sprite):
     def napisy(self, screen, font_style):
         text_zycia = font_style.render("Życia: " + str(self.zycia_), True, (255, 0, 0))
         screen.blit(text_zycia, [0, 0])
-        text_zycia = font_style.render("Poziom: " + str(self.punkty_), True, (255, 0, 0))
+        text_zycia = font_style.render("Punkty: " + str(self.punkty_), True, (255, 0, 0))
         screen.blit(text_zycia, [0, 20])

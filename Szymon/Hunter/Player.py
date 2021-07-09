@@ -4,7 +4,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self,screen):
 
-        self.image_= pygame.image.load("celownik.png").convert()
+        self.image_= pygame.image.load("bb.png")
         self.screen_=screen
         self.rect_=self.image_.get_rect()
         self.x_ = 240
@@ -28,13 +28,13 @@ class Player(pygame.sprite.Sprite):
         dx = 0
         dy = 0
         if pygame.key.get_pressed()[pygame.K_LEFT]:
-            dx -= 8
+            dx -= 9
         if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            dx += 8
+            dx += 9
         if pygame.key.get_pressed()[pygame.K_UP]:
-            dy -= 8
+            dy -= 9
         if pygame.key.get_pressed()[pygame.K_DOWN]:
-            dy += 8
+            dy += 9
         self.move(dx, dy)
 
     def napisy(self, screen, font_style):

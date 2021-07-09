@@ -6,11 +6,11 @@ class Shield(pygame.sprite.Sprite):
 
     def __init__(self,screen):
 
-        self.image_= pygame.image.load("shield.png").convert()
+        self.image_= pygame.image.load("a.png")
         self.screen_=screen
         self.rect_=self.image_.get_rect()
         self.x_ =randrange(200, 300, 1)
-        self.y_ =randrange(120, 260, 1)
+        self.y_ =randrange(120, 200, 1)
         self.dx_=3 * randrange(-1, 1, 2)
         self.dy_=3 * randrange(-1, 1, 2)
 
@@ -25,10 +25,8 @@ class Shield(pygame.sprite.Sprite):
             self.x_ += self.dx_
             self.y_ += self.dy_
         else:
-            # self.x_ += dx
-            # self.y_ += dy
             self.x_ = randrange(200, 300, 1)
-            self.y_ =randrange(120, 260, 1)
+            self.y_ =randrange(120, 200, 1)
             player.zycia_-=1
 
 

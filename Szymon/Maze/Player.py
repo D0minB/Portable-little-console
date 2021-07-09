@@ -60,4 +60,3 @@ class Player(pygame.Rect):
         screen.blit(text_zycia, [0, 0])
         text_zycia = font_style.render("Poziom: " + str(self.poziom), True, (255, 0, 0))
         screen.blit(text_zycia, [0, 20])
-

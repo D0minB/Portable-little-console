@@ -46,7 +46,6 @@ class Game():
         dt = 0
         size = [480, 320]
 
-        # counter_a=0
         screen = pygame.display.set_mode(size)
         player = Player(screen)
         shield = Shield(screen)
@@ -91,7 +90,7 @@ class Game():
                         player.napisy(screen, font_style)
                         if shield.kolizja(player) == True:
                             shield.x_ = randrange(200, 300, 1)
-                            shield.y_ = randrange(120, 260, 1)
+                            shield.y_ = randrange(120, 200, 1)
                             shield.dx_ = randrange(-6, 6, 1)
                             shield.dy_ = randrange(-5, 5, 1)
                             if shield.dx_<2 and shield.dx_>-2:
@@ -108,7 +107,6 @@ class Game():
 
 
                     pygame.display.update()
-                    pygame.display.flip()
 
                 if pygame.key.get_pressed()[pygame.K_b] or player.counter_a==2:
                     player.counter_a=2
@@ -125,7 +123,7 @@ class Game():
                         player.napisy(screen, font_style)
                         if shield.kolizja(player) == True:
                             shield.x_ = randrange(200, 300, 1)
-                            shield.y_ = randrange(120, 260, 1)
+                            shield.y_ = randrange(120, 200, 1)
                             shield.dx_ = randrange(-6, 6, 1)
                             shield.dy_ = randrange(-5, 5, 1)
                             if shield.dx_<2 and shield.dx_>-2:
@@ -151,5 +149,4 @@ class Game():
 
 
                     pygame.display.update()
-                    pygame.display.flip()
         pygame.quit()

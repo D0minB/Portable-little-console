@@ -81,6 +81,6 @@ class Game():
                     self.sterowanie_oknem(player)
 
                 pygame.display.update()
-                pygame.display.flip()
+
 
         pygame.quit()

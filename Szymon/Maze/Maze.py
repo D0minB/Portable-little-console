@@ -72,14 +72,3 @@ class Maze(pygame.Rect):
     def draw_level_2(self):
      for block in self.linie2:
          pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)
-
-
-
-
-
-
-
-
-
-
-

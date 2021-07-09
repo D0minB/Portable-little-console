@@ -1,0 +1,6 @@
+wall texture:
+https://opengameart.org/content/simple-stone-wall
+
+fruit:
+https://i.imgur.com/uoDMsBx.png
+

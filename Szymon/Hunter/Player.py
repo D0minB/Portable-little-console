@@ -4,7 +4,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self,screen):
 
-        self.image_= pygame.image.load("bb.png")
+        self.image_= pygame.image.load("celownik.png")
         self.screen_=screen
         self.rect_=self.image_.get_rect()
         self.x_ = 240

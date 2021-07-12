@@ -4,6 +4,7 @@ import pygame, sys
 from  Shield import Shield
 from random import randrange
 from  Player import Player
+from Heart import Heart
 class Game():
     def napisy_sterowanie(self,screen, font_style):
         text_wylacz = font_style.render("Wciśnij q żeby zamknąć gre", True, (0, 0, 0))
@@ -45,9 +46,10 @@ class Game():
         screen = pygame.display.set_mode(size)
         player = Player(screen)
         shield = Shield(screen)
+        heart=Heart(screen)
         tlo= pygame.sprite.Sprite()
 
-        tlo.image = pygame.image.load("6.png").convert()
+        tlo.image = pygame.image.load("tlo.png").convert()
 
         tlo.rect = tlo.image.get_rect()
 
@@ -84,6 +86,10 @@ class Game():
                         player.draw()
                         shield.move(player)
                         player.napisy(screen, font_style)
+                        if player.punkty_>=6 and player.zycia_<2:
+                            heart.kolizja(player)
+                            heart.draw()
+                            heart.move(player)
                         if shield.kolizja(player) == True:
                             shield.x_ = -20
                             shield.y_ = randrange(70, 270, 1)
@@ -119,8 +125,13 @@ class Game():
                             shield.y_ = randrange(70, 270, 1)
                             shield.dx_ = player.punkty_+5
                             shield.dy_ = 0
-
                             player.punkty_ += 1
+                        if player.punkty_>=6 and player.zycia_<2:
+                            heart.kolizja(player)
+                            heart.draw()
+                            heart.move(player)
+
+
                         if player.punkty_ >= 10:
                              shield.dx_ = 0
                              shield.dy_ = 0

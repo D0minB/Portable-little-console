@@ -12,7 +12,7 @@ class Game():
         screen.blit(text_wlacz, [screen.get_width() / 2 - 150, screen.get_height() / 2 + 30])
     def napisy_sterowanie_2(self,screen, font_style):
         text_wylacz = font_style.render("Wciśnij a żeby grać o rekord", True, (0, 0, 0))
-        text_wlacz = font_style.render("Wciśnij b żeby grać do 8 punktów", True, (0, 0, 0))
+        text_wlacz = font_style.render("Wciśnij b żeby grać do 10 punktów", True, (0, 0, 0))
         screen.blit(text_wylacz, [screen.get_width() / 2 - 140, screen.get_height() / 2 + 10])
         screen.blit(text_wlacz, [screen.get_width() / 2 - 150, screen.get_height() / 2 + 30])
 
@@ -26,12 +26,8 @@ class Game():
             player.punkty_ = 0
             player.x_ = 240
             player.y_ = 160
-            shield.dx_ = randrange(-6, 6, 1)
-            shield.dy_ = randrange(-5, 5, 1)
-            if shield.dx_ < 2 and shield.dx_ > -2:
-                shield.dx_ = 4
-            if shield.dy_ < 2 and shield.dy_ > -2:
-                shield.dy_ = -4
+            shield.dx_ = player.punkty_+5
+            shield.dy_ = 0
 
 
 
@@ -89,14 +85,11 @@ class Game():
                         shield.move(player)
                         player.napisy(screen, font_style)
                         if shield.kolizja(player) == True:
-                            shield.x_ = randrange(200, 300, 1)
-                            shield.y_ = randrange(120, 200, 1)
-                            shield.dx_ = randrange(-6, 6, 1)
-                            shield.dy_ = randrange(-5, 5, 1)
-                            if shield.dx_<2 and shield.dx_>-2:
-                                shield.dx_=4
-                            if shield.dy_<2 and shield.dy_>-2:
-                                shield.dy_=-4
+                            shield.x_ = -20
+                            shield.y_ = randrange(70, 270, 1)
+                            shield.dx_ = player.punkty_+5
+                            shield.dy_ =0
+
                             player.punkty_ += 1
                     if player.zycia_ <= 0:
                         screen.fill((255, 0, 0))
@@ -122,16 +115,13 @@ class Game():
                         shield.move(player)
                         player.napisy(screen, font_style)
                         if shield.kolizja(player) == True:
-                            shield.x_ = randrange(200, 300, 1)
-                            shield.y_ = randrange(120, 200, 1)
-                            shield.dx_ = randrange(-6, 6, 1)
-                            shield.dy_ = randrange(-5, 5, 1)
-                            if shield.dx_<2 and shield.dx_>-2:
-                                shield.dx_=4
-                            if shield.dy_<2 and shield.dy_>-2:
-                                shield.dy_=-4
+                            shield.x_ = -20
+                            shield.y_ = randrange(70, 270, 1)
+                            shield.dx_ = player.punkty_+5
+                            shield.dy_ = 0
+
                             player.punkty_ += 1
-                        if player.punkty_ >= 8:
+                        if player.punkty_ >= 10:
                              shield.dx_ = 0
                              shield.dy_ = 0
                              screen.fill((0, 255, 127))

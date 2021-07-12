@@ -9,10 +9,10 @@ class Shield(pygame.sprite.Sprite):
         self.image_= pygame.image.load("a.png")
         self.screen_=screen
         self.rect_=self.image_.get_rect()
-        self.x_ =randrange(200, 300, 1)
-        self.y_ =randrange(120, 200, 1)
-        self.dx_=3 * randrange(-1, 1, 2)
-        self.dy_=3 * randrange(-1, 1, 2)
+        self.x_ =-20
+        self.y_ =randrange(70, 270, 1)
+        self.dx_=5
+        self.dy_=0
 
 
 
@@ -21,12 +21,12 @@ class Shield(pygame.sprite.Sprite):
         self.rect_.center = [self.x_, self.y_]
 
     def move(self,player):
-        if self.x_ + self.dx_ - 3 > -16 and self.x_ + self.dx_ + 3 < 496 and self.y_ + self.dy_ > -16 and self.y_ + self.dy_ < 336:
+        if  self.x_ + self.dx_ + 3 < 496:# and self.y_ + self.dy_ < 336:
             self.x_ += self.dx_
             self.y_ += self.dy_
         else:
-            self.x_ = randrange(200, 300, 1)
-            self.y_ =randrange(120, 200, 1)
+            self.x_ = -20
+            self.y_ =randrange(70, 270, 1)
             player.zycia_-=1
 
 

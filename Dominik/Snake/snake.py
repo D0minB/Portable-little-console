@@ -1,14 +1,12 @@
 # SNAKE
 # AUTHOR: DOMINIK BOGIELCZYK
 import time
-from time import sleep
-
 from pygame.math import Vector2
 from random import randint
 import pygame
 import sys
-
 from collections import Counter
+from MCP3008_class import MCP3008
 
 
 class Block(pygame.sprite.Sprite):
@@ -63,99 +61,16 @@ class Wall_part(pygame.sprite.Sprite):
 
 
 pygame.init()
-# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-screen = pygame.display.set_mode((480, 320))
+pygame.mouse.set_visible(0)
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+#screen = pygame.display.set_mode((480, 320))
 
-font20 = pygame.font.SysFont("bahnschrift", 20)
-font40 = pygame.font.SysFont("bahnschrift", 40)
-
-
-def start_screen(background):
-    screen.fill((0, 0, 0))
-    background.draw(screen)
-    text = font40.render("SNAKE", True, (122,154,175))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, 20))
-    screen.blit(text, text_rect)
-
-    text = font20.render("Sterowanie strzałkami", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2 - 50))
-    screen.blit(text, text_rect)
-
-    text = font20.render("Spacja - rozpocznij grę", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
-    screen.blit(text, text_rect)
-    pygame.display.update()
-
-    start_game=0
-    while start_game==0:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                pygame.quit()
-                sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
-                start_game=1
+font20 = pygame.font.SysFont("calibri", 20)
+font40 = pygame.font.SysFont("calibri", 40)
+font30 = pygame.font.SysFont("calibri", 30)
 
 
-#################################################################################3
-def end_screen(points, record):
-    screen.fill((0, 0, 0))
-
-    text = font40.render("Twój wynik: " + str(points), True, (255, 0, 0))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
-    screen.blit(text, text_rect)
-
-    text = font20.render("q - wyjdź, spacja - nowa gra", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, 260))
-    screen.blit(text, text_rect)
-
-    if points > record:
-        f = open("snake_record.txt", "w")
-        f.write(str(points))
-        f.close()
-
-        text = font40.render("NOWY REKORD", True, (0, 255, 0))
-        text_rect = text.get_rect(center=(screen.get_width() / 2, 50))
-        screen.blit(text, text_rect)
-
-    else:
-        text = font40.render("KONIEC GRY", True, (255, 0, 0))
-        text_rect = text.get_rect(center=(screen.get_width() / 2, 50))
-        screen.blit(text, text_rect)
-
-    pygame.display.update()
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                pygame.quit()
-                sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
-                snake()
-
-
-def snake():
-    dt = 0.0
-    fps = 3.0
-    clock = pygame.time.Clock()
-    points = 0
-    direction = "left"
-    lvl = 1
-    lvl_points = 0
-    next_level = [10, 15, 20, 25]
-    block_size = 20
-    start = True
-
-    snake_head_group = pygame.sprite.Group()
-    snake_body_group = pygame.sprite.Group()
-
-    snake_head = Block(screen.get_width() / 2, screen.get_height() / 2, orientation_=direction, is_head=True)
-    snake_head_group.add(snake_head)
-
-    for i in range(4):
-        snake_body_group.add(
-            Block(screen.get_width() / 2 + block_size * (i + 1), screen.get_height() / 2, orientation_=direction))
-
-    # MAKE BACKGROUND - WALLS AND SAND
+def make_background():
     background = pygame.sprite.Group()
     arena = pygame.sprite.Sprite()
     arena.image = pygame.image.load("textures/background.png")
@@ -169,7 +84,95 @@ def snake():
     for i in range(int((screen.get_width() - 40) / 20)):
         background.add(Wall_part(20 + 20 * i, 40))
         background.add(Wall_part(20 + 20 * i, screen.get_height() - 20))
+    return background
 
+
+def draw_text(text, font, color, position):
+    t = font.render(text, True, color)
+    text_rect = t.get_rect(center=(position.x, position.y))
+    screen.blit(t, text_rect)
+    pygame.display.update(text_rect.x, text_rect.y-5, text_rect.width, text_rect.height+10)
+
+
+def start_screen(background):
+    screen.fill((0, 0, 0))
+    background.draw(screen)
+
+    draw_text("SNAKE", font40, (122, 154, 175), Vector2((screen.get_width() / 2, 20)))
+    draw_text("Sterowanie strzałkami", font20, (255, 255, 255),
+              Vector2(screen.get_width() / 2, screen.get_height() / 2 - 50))
+    draw_text("Spacja - rozpocznij grę", font20, (255, 255, 255),
+              Vector2(screen.get_width() / 2, screen.get_height() / 2))
+
+    pygame.display.update()
+
+    start_game = False
+    while not start_game:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+                pygame.quit()
+                sys.exit()
+            if pygame.key.get_pressed()[pygame.K_SPACE]:
+                start_game = True
+
+
+#################################################################################
+def end_screen(points, record):
+    screen.fill((0, 0, 0))
+
+    text = font20.render("q - wyjdź, spacja - nowa gra", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(screen.get_width() / 2, 260))
+    screen.blit(text, text_rect)
+
+    if points > record:
+        f = open("snake_record.txt", "w")
+        f.write(str(points))
+        f.close()
+        draw_text("NOWY REKORD", font40, (0, 255, 0), Vector2(screen.get_width() / 2, 50))
+        draw_text("Twój wynik: " + str(points), font40, (0, 255, 0),
+                  Vector2(screen.get_width() / 2, screen.get_height() / 2))
+    else:
+        draw_text("KONIEC GRY", font40, (255, 0, 0), Vector2(screen.get_width() / 2, 50))
+        draw_text("Twój wynik: " + str(points), font40, (255, 0, 0),
+                  Vector2(screen.get_width() / 2, screen.get_height() / 2))
+
+    pygame.display.update()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+                pygame.quit()
+                sys.exit()
+            if pygame.key.get_pressed()[pygame.K_SPACE]:
+                snake(False)
+
+adc = MCP3008()
+
+def snake(start=True):
+    dt = 0.0
+    fps = 4.0
+    clock = pygame.time.Clock()
+    points = 0
+    direction = "left"
+    lvl = 1
+    lvl_points = 0  # points at this level
+    next_level = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70] #how many points to next lvl
+    block_size = 20
+    first_frame = True
+
+    # SNAKE INIT
+    snake_head_group = pygame.sprite.Group()
+    snake_body_group = pygame.sprite.Group()
+    snake_head = Block(screen.get_width() / 2, screen.get_height() / 2, orientation_=direction, is_head=True)
+    snake_head_group.add(snake_head)
+    for i in range(4):
+        snake_body_group.add(
+            Block(screen.get_width() / 2 + block_size * (i + 1), screen.get_height() / 2, orientation_=direction))
+
+    # MAKE BACKGROUND - WALLS AND SAND
+    background = make_background()
+
+    # FRUIT INIT
     fruit_group = pygame.sprite.Group()
     fruit = Block(20 + 5 * 20, 60 + 7 * 20, None, None, True)
     fruit_group.add(fruit)
@@ -181,13 +184,13 @@ def snake():
         record = int(record)
 
     while True:
-        t1=time.time()
-        if start==1:
+        t1 = time.time()
+        if start == 1:
             start_screen(background)
-        start=0
-        t2=time.time()
+        start = 0
+        t2 = time.time()
 
-        dt-=t2-t1
+        dt -= t2 - t1
 
         dt += clock.tick() / 1000.0
         for event in pygame.event.get():
@@ -195,13 +198,13 @@ def snake():
                 pygame.quit()
                 sys.exit()
 
-            if pygame.key.get_pressed()[pygame.K_LEFT] and direction != "right":
+            if (pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=2) < 50) and direction != "right":
                 direction = "left"
-            if pygame.key.get_pressed()[pygame.K_RIGHT] and direction != "left":
+            if (pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=2) > 600) and direction != "left":
                 direction = "right"
-            if pygame.key.get_pressed()[pygame.K_UP] and direction != "down":
+            if (pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=1) > 600) and direction != "down":
                 direction = "up"
-            if pygame.key.get_pressed()[pygame.K_DOWN] and direction != "up":
+            if (pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=1) < 50) and direction != "up":
                 direction = "down"
 
         while dt > 1 / fps:
@@ -222,7 +225,7 @@ def snake():
             if len(pos) > len(unique_pos):
                 end_screen(points, record)
 
-            # Update snake
+            # Update snake after movement
             i = 0
             for obj in snake_body_group:
                 obj.orientation = orientation[i]
@@ -242,27 +245,65 @@ def snake():
             if snake_head.rect.colliderect(fruit.rect) == 1:
                 points += 1
                 lvl_points += 1
+
+                # NEW FRUIT GENERATING
                 fruit.rect.x = 20 + randint(0, 21) * 20
                 fruit.rect.y = 60 + randint(0, 11) * 20
+
+                # FRUIT CAN'T BE IN PLACE WHERE SNAKE IS
+                for i in range(len(pos)):
+                    if pos[i].x == fruit.rect.x and pos[i].y == fruit.rect.y:
+                        fruit.rect.x = 20 + randint(0, 21) * 20
+                        fruit.rect.y = 60 + randint(0, 11) * 20
+                        i = 0
+
+                fruit_group.draw(screen)
+
+                pygame.display.update(pygame.Rect(fruit.rect.x, fruit.rect.y, 20, 20))
+
+                if lvl_points < next_level[lvl - 1]:
+                    text = font20.render(str(points), True, color)
+                    text_rect = text.get_rect(topleft=(100, 5))
+                    screen.blit(text, text_rect)
+                    pygame.display.update(pygame.Rect(text_rect.x, text_rect.y, text_rect.width + 5, text_rect.height))
+
                 snake_body_group.add(
                     Block(pos[len(pos) - 1].x, pos[len(pos) - 1].y, orientation_=orientation[len(orientation) - 1]))
 
-            # NEW LEVEL
+            # NEXT LEVEL
             if lvl_points >= next_level[lvl - 1]:
                 lvl += 1
                 lvl_points = 0
-                text = font40.render("POZIOM " + str(lvl), True, (255, 0, 0))
-                text_rect = text.get_rect(center=(screen.get_width() / 2, screen.get_height() / 2))
-                screen.blit(text, text_rect)
-                pygame.display.update(text_rect)
-                sleep(1)
-                dt -= 1
 
+                draw_text("POZIOM " + str(lvl), font40, (255, 0, 0),
+                          Vector2(screen.get_width() / 2, screen.get_height() / 2))
+                draw_text("Naciśnij spację", font20, (255, 0, 0),
+                          Vector2(screen.get_width() / 2, screen.get_height() / 2 + 80))
+
+                # WAITING FOR SPACE PRESS
+                t1 = time.time()
+                start_level = False
+                while not start_level:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+                            pygame.quit()
+                            sys.exit()
+                        if pygame.key.get_pressed()[pygame.K_SPACE]:
+                            start_level = True
+                t2 = time.time()
+                dt -= t2 - t1
+
+                # FASTER SNAKE MOVEMENT IN NEXT LEVEL
+                fps += 0.5
+
+                # SNAKE RETURN TO SIZE = 4
                 i = 0
                 for obj in snake_body_group:
                     if i >= 3:
                         snake_body_group.remove(obj)
                     i += 1
+
+                first_frame = True
 
             # DRAWING
             if points > record:
@@ -270,23 +311,34 @@ def snake():
                 color = (0, 255, 0)
             else:
                 record_info = record
-                color = (122, 154, 175)
+                color = (122,154,175)
 
             snake_head_group.update(direction, block_size)
             screen.fill((0, 0, 0))
             background.draw(screen)
-            text = font20.render("Punkty:   " + str(points) + "       Rekord:   " + str(record_info), True, color)
-            screen.blit(text, [20, 5])
-            text = font20.render("Poziom " + str(lvl) + "      " + str(lvl_points) + "/" + str(next_level[lvl - 1]),
-                                 True,
-                                 color)
-            screen.blit(text, [screen.get_width() - 160, 5])
 
-            fruit_group.draw(screen)
             snake_head_group.draw(screen)
             snake_body_group.draw(screen)
 
-            pygame.display.update()
+            draw_text("Punkty:  " + str(points) + "      Rekord:  " + str(record_info), font30, color,
+                      Vector2(135, 20))
+            draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font30, color,
+                      Vector2((screen.get_width() - 100, 20)))
+
+            if first_frame == 1:
+                fruit_group.draw(screen)
+                pygame.display.update()
+            else:
+                # head update
+                for obj in snake_head_group:
+                    pygame.display.update(pygame.Rect(obj.rect.x, obj.rect.y, 20, 20))
+                # previous head update
+                pygame.display.update(pygame.Rect(pos[0].x, pos[0].y, 20, 20))
+
+                # last snake part update
+                pygame.display.update(pygame.Rect(pos[len(pos) - 1].x, pos[len(pos) - 1].y, 20, 20))
+
+            first_frame = False
 
 
 snake()

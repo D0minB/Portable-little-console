@@ -4,9 +4,11 @@ import time
 from pygame.math import Vector2
 from random import randint
 import pygame
+#print(pygame.font.get_fonts())
 import sys
 from collections import Counter
 from MCP3008_class import MCP3008
+import RPi.GPIO as GPIO
 
 
 class Block(pygame.sprite.Sprite):
@@ -14,17 +16,17 @@ class Block(pygame.sprite.Sprite):
         super().__init__()
         self.orientation = orientation_
         if is_head == 0 and is_fruit == 0:
-            self.image_h = pygame.image.load("textures/snake_sprite_horizontal.png")
-            self.image_v = pygame.image.load("textures/snake_sprite_vertical.png")
+            self.image_h = pygame.image.load("textures/snake_sprite_horizontal.png").convert()
+            self.image_v = pygame.image.load("textures/snake_sprite_vertical.png").convert()
             self.image = self.image_h  # default image
         elif is_head == 1:
-            self.image_left = pygame.image.load("textures/snake_head_left.png")
-            self.image_right = pygame.image.load("textures/snake_head_right.png")
-            self.image_up = pygame.image.load("textures/snake_head_up.png")
-            self.image_down = pygame.image.load("textures/snake_head_down.png")
+            self.image_left = pygame.image.load("textures/snake_head_left.png").convert()
+            self.image_right = pygame.image.load("textures/snake_head_right.png").convert()
+            self.image_up = pygame.image.load("textures/snake_head_up.png").convert()
+            self.image_down = pygame.image.load("textures/snake_head_down.png").convert()
             self.image = self.image_left  # default image
         else:
-            self.image = pygame.image.load("textures/fruit.png")
+            self.image = pygame.image.load("textures/fruit.png").convert_alpha()
 
         self.rect = screen.blit(self.image, (pos_x, pos_y))
 
@@ -56,24 +58,30 @@ class Block(pygame.sprite.Sprite):
 class Wall_part(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__()
-        self.image = pygame.image.load("textures/wall.png")
+        self.image = pygame.image.load("textures/wall.png").convert()
         self.rect = screen.blit(self.image, (pos_x, pos_y))
 
 
 pygame.init()
 pygame.mouse.set_visible(0)
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-#screen = pygame.display.set_mode((480, 320))
 
-font20 = pygame.font.SysFont("calibri", 20)
-font40 = pygame.font.SysFont("calibri", 40)
-font30 = pygame.font.SysFont("calibri", 30)
+font20 = pygame.font.SysFont("calibri",20)
+font40 = pygame.font.SysFont("calibri",40)
+font30 = pygame.font.SysFont("calibri",30)
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
 
 def make_background():
     background = pygame.sprite.Group()
     arena = pygame.sprite.Sprite()
-    arena.image = pygame.image.load("textures/background.png")
+    arena.image = pygame.image.load("textures/background.png").convert()
     arena.rect = screen.blit(arena.image, (20, 60))
     background.add(arena)
 
@@ -99,9 +107,9 @@ def start_screen(background):
     background.draw(screen)
 
     draw_text("SNAKE", font40, (122, 154, 175), Vector2((screen.get_width() / 2, 20)))
-    draw_text("Sterowanie strzałkami", font20, (255, 255, 255),
+    draw_text("Sterowanie przyciskami", font20, (255, 255, 255),
               Vector2(screen.get_width() / 2, screen.get_height() / 2 - 50))
-    draw_text("Spacja - rozpocznij grę", font20, (255, 255, 255),
+    draw_text("Przycisk 'lewo' - rozpocznij gre", font20, (255, 255, 255),
               Vector2(screen.get_width() / 2, screen.get_height() / 2))
 
     pygame.display.update()
@@ -112,15 +120,15 @@ def start_screen(background):
             if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
                 pygame.quit()
                 sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
-                start_game = True
+            if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0:
+                start_game = True 
 
 
 #################################################################################
 def end_screen(points, record):
     screen.fill((0, 0, 0))
 
-    text = font20.render("q - wyjdź, spacja - nowa gra", True, (255, 255, 255))
+    text = font20.render("Przycisk 'dol' - wyjdź, przycisk 'lewo' - nowa gra", True, (255, 255, 255))
     text_rect = text.get_rect(center=(screen.get_width() / 2, 260))
     screen.blit(text, text_rect)
 
@@ -140,17 +148,16 @@ def end_screen(points, record):
 
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q] or GPIO.input(32) == 0:
                 pygame.quit()
                 sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE]:
+            if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0:
                 snake(False)
 
-adc = MCP3008()
 
 def snake(start=True):
     dt = 0.0
-    fps = 4.0
+    fps = 6.0
     clock = pygame.time.Clock()
     points = 0
     direction = "left"
@@ -159,6 +166,8 @@ def snake(start=True):
     next_level = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70] #how many points to next lvl
     block_size = 20
     first_frame = True
+    
+    adc = MCP3008()
 
     # SNAKE INIT
     snake_head_group = pygame.sprite.Group()
@@ -197,18 +206,31 @@ def snake(start=True):
             if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
                 pygame.quit()
                 sys.exit()
-
-            if (pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=2) < 50) and direction != "right":
-                direction = "left"
-            if (pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=2) > 600) and direction != "left":
-                direction = "right"
-            if (pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=1) > 600) and direction != "down":
-                direction = "up"
-            if (pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=1) < 50) and direction != "up":
-                direction = "down"
+            
 
         while dt > 1 / fps:
+            result_changed = False
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+                    pygame.quit()
+                    sys.exit()
+                    
+            #if (adc.read(channel=2) < 50 or GPIO.input(31) == 0 ) and direction != "right":
+            if GPIO.input(31) == 0 and direction != "right":
+                direction = "left"
+            #elif (adc.read(channel=2) > 600 or GPIO.input(33) == 0 ) and direction != "left":
+            elif GPIO.input(33) == 0  and direction != "left":
+                direction = "right"
+            #elif (adc.read(channel=1) > 600 or GPIO.input(37) == 0 ) and direction != "down":
+            elif GPIO.input(37) == 0  and direction != "down":
+                direction = "up"
+            #elif (adc.read(channel=1) < 50 or GPIO.input(32) == 0 ) and direction != "up":
+            elif GPIO.input(32) == 0  and direction != "up":
+                direction = "down"
+                
             dt -= 1 / fps
+            
             pos = []
             orientation = []
             for obj in snake_head_group:
@@ -218,6 +240,7 @@ def snake(start=True):
             for obj in snake_body_group:
                 pos.append(Vector2(obj.rect.x, obj.rect.y))
                 orientation.append(obj.get_orientation())
+                
 
             # Head meet other snake part
             temp = Counter([tuple(x) for x in pos])
@@ -240,11 +263,13 @@ def snake(start=True):
             for head in snake_head_group:
                 if head.rect.x < block_size or head.rect.x > screen.get_width() - 2 * block_size or head.rect.y < 3 * block_size or head.rect.y > screen.get_height() - 2 * block_size:
                     end_screen(points, record)
+            
 
             # THE SNAKE EATS THE FRUIT
             if snake_head.rect.colliderect(fruit.rect) == 1:
                 points += 1
                 lvl_points += 1
+                result_changed = True
 
                 # NEW FRUIT GENERATING
                 fruit.rect.x = 20 + randint(0, 21) * 20
@@ -277,7 +302,7 @@ def snake(start=True):
 
                 draw_text("POZIOM " + str(lvl), font40, (255, 0, 0),
                           Vector2(screen.get_width() / 2, screen.get_height() / 2))
-                draw_text("Naciśnij spację", font20, (255, 0, 0),
+                draw_text("Naciśnij przycisk", font20, (255, 0, 0),
                           Vector2(screen.get_width() / 2, screen.get_height() / 2 + 80))
 
                 # WAITING FOR SPACE PRESS
@@ -288,13 +313,13 @@ def snake(start=True):
                         if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
                             pygame.quit()
                             sys.exit()
-                        if pygame.key.get_pressed()[pygame.K_SPACE]:
+                        if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0 or GPIO.input(32) == 0 or GPIO.input(33) == 0 or GPIO.input(37) == 0:
                             start_level = True
                 t2 = time.time()
                 dt -= t2 - t1
 
                 # FASTER SNAKE MOVEMENT IN NEXT LEVEL
-                fps += 0.5
+                fps += 1.0
 
                 # SNAKE RETURN TO SIZE = 4
                 i = 0
@@ -314,16 +339,20 @@ def snake(start=True):
                 color = (122,154,175)
 
             snake_head_group.update(direction, block_size)
+            
+            
             screen.fill((0, 0, 0))
+            
             background.draw(screen)
+            
 
             snake_head_group.draw(screen)
             snake_body_group.draw(screen)
+            
 
-            draw_text("Punkty:  " + str(points) + "      Rekord:  " + str(record_info), font30, color,
-                      Vector2(135, 20))
-            draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font30, color,
-                      Vector2((screen.get_width() - 100, 20)))
+            if first_frame == True or result_changed == True:
+                draw_text("Punkty:  " + str(points) + "      Rekord:  " + str(record_info), font30, color,Vector2(135, 20))
+                draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font30, color, Vector2((screen.get_width() - 100, 20)))
 
             if first_frame == 1:
                 fruit_group.draw(screen)
@@ -334,11 +363,13 @@ def snake(start=True):
                     pygame.display.update(pygame.Rect(obj.rect.x, obj.rect.y, 20, 20))
                 # previous head update
                 pygame.display.update(pygame.Rect(pos[0].x, pos[0].y, 20, 20))
-
+   
                 # last snake part update
                 pygame.display.update(pygame.Rect(pos[len(pos) - 1].x, pos[len(pos) - 1].y, 20, 20))
 
+            
             first_frame = False
-
+            
+           
 
 snake()

@@ -1,9 +1,7 @@
 import pygame
-import time
 class Player(pygame.sprite.Sprite):
 
     def __init__(self,screen):
-
         self.image_= pygame.image.load("celownik.png")
         self.screen_=screen
         self.rect_=self.image_.get_rect()
@@ -12,17 +10,17 @@ class Player(pygame.sprite.Sprite):
         self.zycia_=3
         self.punkty_=0
         self.counter_a=0
+        self.szerokosc_ = self.image_.get_width()
+        self.wysokosc_ = self.image_.get_height()
 
     def draw(self):
         self.screen_.blit(self.image_, self.rect_)
         self.rect_.center = [self.x_, self.y_]
 
-
     def move(self,dx,dy):
-        if self.x_+dx-3>0 and self.x_+ dx+3 < 475 and self.y_+dy>0 and self.y_+dy<320:
+        if self.x_+dx-self.szerokosc_/2>0 and self.x_+ dx+self.szerokosc_/2 < 480 and self.y_+dy>0 and self.y_+dy<320:
                 self.x_+=dx
                 self.y_+=dy
-
 
     def sterowanie(self,dx,dy):
         dx = 0

@@ -1,5 +1,3 @@
-import pygame
-import time
 import pygame, sys
 from  Shield import Shield
 from random import randrange
@@ -30,30 +28,26 @@ class Game():
             shield.dx_ = player.punkty_+5
             shield.dy_ = 0
 
-
-
     def __init__(self):
         pygame.init()
-
         clock = pygame.time.Clock()
-
         fps = 10.0
         dx = 0
         dy = 0
         dt = 0
-        size = [480, 320]
-
+        size_szerokosc = 480
+        size_wysokosc=320
+        size=[size_szerokosc,size_wysokosc]
         screen = pygame.display.set_mode(size)
         player = Player(screen)
         shield = Shield(screen)
         heart=Heart(screen)
-        tlo= pygame.sprite.Sprite()
-
-        tlo.image = pygame.image.load("tlo.png").convert()
-
-        tlo.rect = tlo.image.get_rect()
-
-
+        tlo_a= pygame.sprite.Sprite()
+        tlo_a.image = pygame.image.load("tlo_a.png").convert()
+        tlo_a.rect = tlo_a.image.get_rect()
+        tlo_b = pygame.sprite.Sprite()
+        tlo_b.image = pygame.image.load("tlo_b.png").convert()
+        tlo_b.rect = tlo_b.image.get_rect()
         font_style = pygame.font.SysFont("dejavuserif", 20)
         font_style2 = pygame.font.SysFont("dejavuserif", 60)
         running = True
@@ -65,9 +59,6 @@ class Game():
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         running = False
-
-
-
                 if player.counter_a==0:
                     screen.fill((186, 85, 211))
                     self.napisy_sterowanie_2(screen, font_style)
@@ -75,13 +66,9 @@ class Game():
                     pygame.display.flip()
                 if pygame.key.get_pressed()[pygame.K_a] or player.counter_a==1:
                     player.counter_a=1
-
                     if player.zycia_ > 0:
-
-
-                        screen.blit(tlo.image, tlo.rect)
+                        screen.blit(tlo_a.image, tlo_a.rect)
                         player.sterowanie(dx, dy)
-
                         shield.draw()
                         player.draw()
                         shield.move(player)
@@ -95,7 +82,6 @@ class Game():
                             shield.y_ = randrange(70, 270, 1)
                             shield.dx_ = player.punkty_+5
                             shield.dy_ =0
-
                             player.punkty_ += 1
                     if player.zycia_ <= 0:
                         screen.fill((255, 0, 0))
@@ -103,19 +89,12 @@ class Game():
                         screen.blit(text_koniec, [screen.get_width() / 2 - 120, screen.get_height() / 2 - 50])
                         self.napisy_sterowanie(screen, font_style)
                         self.sterowanie_oknem(player,shield)
-
-
                     pygame.display.update()
-
                 if pygame.key.get_pressed()[pygame.K_b] or player.counter_a==2:
                     player.counter_a=2
-
                     if player.zycia_ > 0:
-
-
-                        screen.blit(tlo.image, tlo.rect)
+                        screen.blit(tlo_b.image, tlo_b.rect)
                         player.sterowanie(dx, dy)
-
                         shield.draw()
                         player.draw()
                         shield.move(player)
@@ -130,8 +109,6 @@ class Game():
                             heart.kolizja(player)
                             heart.draw()
                             heart.move(player)
-
-
                         if player.punkty_ >= 10:
                              shield.dx_ = 0
                              shield.dy_ = 0
@@ -140,14 +117,11 @@ class Game():
                              self.napisy_sterowanie(screen, font_style)
                              screen.blit(text_win, [screen.get_width() / 2 - 120, screen.get_height() / 2 - 50])
                              self.sterowanie_oknem(player,shield)
-
                     if player.zycia_ <= 0:
                         screen.fill((255, 0, 0))
                         text_koniec = font_style2.render("Porażka!", True, (0, 0, 0))
                         screen.blit(text_koniec, [screen.get_width() / 2 - 120, screen.get_height() / 2 - 50])
                         self.napisy_sterowanie(screen, font_style)
                         self.sterowanie_oknem(player,shield)
-
-
                     pygame.display.update()
         pygame.quit()

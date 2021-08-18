@@ -25,3 +25,11 @@ class Plane(pygame.Rect):
 
     def get_position(self):
         return self._blocks[1]
+
+        
+    def update(self,dx):
+        if dx>0:
+            pygame.display.update(pygame.Rect(self._blocks[3].x-dx,self._blocks[1].y,63+dx,42))
+        elif dx<0:
+            pygame.display.update(pygame.Rect(self._blocks[3].x,self._blocks[1].y,63+abs(dx),42))
+        

@@ -8,16 +8,18 @@ class Player(pygame.Rect):
         self.screen_=screen
         self.zycia=3
         self.poziom=1
+        self.width_=6
+        self.height_=6
 
 
 
 
 
     def draw(self):
-            pygame.draw.rect(self.screen_, (255, 69, 0), pygame.Rect(self.x_,self.y_,6,6))
+            pygame.draw.rect(self.screen_, (255, 69, 0), pygame.Rect(self.x_,self.y_,self.width_,self.height_))
 
     def move(self,dx,dy):
-        if self.x_+dx-3>0 and self.x_+ dx+3 < 475 and self.y_+dy>0 and self.y_+dy<320:
+        if self.x_+dx-self.width_/2>0 and self.x_+ dx+self.width_/2 < 475 and self.y_+dy>0 and self.y_+dy<320-self.height_/2:
                 self.x_+=dx
                 self.y_+=dy
 
@@ -42,7 +44,7 @@ class Player(pygame.Rect):
             if linia[1] == linia[3]:
                 szerokosc = abs(linia[2] - linia[0])
                 dlugosc = 2
-            if pygame.Rect(self.x_, self.y_, 6, 6).colliderect(
+            if pygame.Rect(self.x_, self.y_, self.width_, self.height_).colliderect(
                     pygame.Rect(linia[0], linia[1], szerokosc, dlugosc)) == True:
                 self.x_ = 16
                 self.y_ = 310
@@ -50,7 +52,7 @@ class Player(pygame.Rect):
 
     def win(self,screen):
         pygame.draw.rect(screen, (255, 255, 255), [332, 0, 18, 10])
-        if pygame.Rect(self.x_, self.y_, 6, 6).colliderect(pygame.Rect(332, 0, 18, 10)) == True:
+        if pygame.Rect(self.x_, self.y_, self.width_, self.height_).colliderect(pygame.Rect(332, 0, 18, 10)) == True:
             self.x_ = 16
             self.y_ = 310
             self.poziom += 1

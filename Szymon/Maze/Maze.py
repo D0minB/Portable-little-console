@@ -6,6 +6,7 @@ class Maze(pygame.Rect):
         self.screen_ = screen
         self.linie=[]
         self.linie2=[]
+        self.linie3=[]
         self.color_=(0,0,0)
         self.width_=width
 
@@ -64,6 +65,36 @@ class Maze(pygame.Rect):
         self.linie2.append((330, 0, 330, 60))
         #self.blocks.append((10,200))
 
+        self.linie3.append((10,210,10,320))
+        self.linie3.append((30, 230, 30, 320))
+        self.linie3.append((30, 230, 60, 230))
+        self.linie3.append((10, 210, 100, 210))
+        self.linie3.append((60, 230, 60, 315))
+        self.linie3.append((80, 230, 80, 300))
+        self.linie3.append((80, 230, 120, 230))
+        self.linie3.append((100, 140, 100, 210))
+        self.linie3.append((120, 160, 120, 230))
+        self.linie3.append((120, 160, 200, 160))
+        self.linie3.append((100, 140,220, 140))
+        self.linie3.append((200, 160, 200, 250))
+        self.linie3.append((220, 140, 220, 230))
+        self.linie3.append((220, 230, 270, 230))
+        self.linie3.append((200, 250, 290, 250))
+        self.linie3.append((270, 120, 270, 230))
+        self.linie3.append((290, 140, 290, 250))
+        self.linie3.append((270, 120, 330, 120))
+        self.linie3.append((290, 140, 350, 140))
+        self.linie3.append((330, 0, 330, 120))
+        self.linie3.append((350, 110, 350, 140))
+        self.linie3.append((350, 0, 350, 95))
+        self.linie3.append((80, 300, 430, 300))
+        self.linie3.append((60, 315, 445, 315))
+        self.linie3.append((430, 110, 430, 300))
+        self.linie3.append((445, 95, 445, 315))
+        self.linie3.append((350, 110, 430, 110))
+        self.linie3.append((350, 95, 445, 95))
+
+
     def set_color(self,new_color):
         self.color_=new_color
     def draw_level_1(self):
@@ -71,4 +102,7 @@ class Maze(pygame.Rect):
          pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)
     def draw_level_2(self):
      for block in self.linie2:
+         pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)
+    def draw_level_3(self):
+     for block in self.linie3:
          pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)

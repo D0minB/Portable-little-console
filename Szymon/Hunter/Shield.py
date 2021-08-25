@@ -7,7 +7,7 @@ class Shield(pygame.sprite.Sprite):
         self.rect_=self.image_.get_rect()
         self.x_ =-20
         self.y_ =randrange(70, 270, 1)
-        self.dx_=5
+        self.dx_=11
         self.dy_=0
         self.szerokosc_=self.image_.get_width()
         self.wysokosc_=self.image_.get_height()

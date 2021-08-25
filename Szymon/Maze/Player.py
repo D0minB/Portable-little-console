@@ -10,13 +10,14 @@ class Player(pygame.Rect):
         self.poziom=1
         self.width_=6
         self.height_=6
+        self.color_=(255, 69, 0)
 
 
 
 
 
     def draw(self):
-            pygame.draw.rect(self.screen_, (255, 69, 0), pygame.Rect(self.x_,self.y_,self.width_,self.height_))
+            pygame.draw.rect(self.screen_, self.color_, pygame.Rect(self.x_,self.y_,self.width_,self.height_))
 
     def move(self,dx,dy):
         if self.x_+dx-self.width_/2>0 and self.x_+ dx+self.width_/2 < 475 and self.y_+dy>0 and self.y_+dy<320-self.height_/2:

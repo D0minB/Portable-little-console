@@ -74,8 +74,18 @@ class Game():
                         player.win(screen)
                         player.napisy(screen, font_style)
                         player.draw()
+                    if player.poziom == 4:
+                        player.sterowanie(dx, dy)
+                        screen.fill((0, 0, 0))
+                        player.color_=	(0, 255, 255)
+                        maze.set_color((255, 0, 0))
+                        maze.draw_level_4()
+                        player.kolizje(maze.linie4)
+                        player.win(screen)
+                        player.napisy(screen, font_style)
+                        player.draw()
 
-                    if player.poziom > 3:
+                    if player.poziom > 4:
                         screen.fill((0, 255, 127))
                         text_win = font_style2.render("Wygrana!", True, (0, 0, 0))
                         self.napisy_sterowanie(screen, font_style)

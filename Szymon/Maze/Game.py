@@ -48,6 +48,7 @@ class Game():
 
                     if player.poziom == 1:
                         player.sterowanie(dx, dy)
+                        player.color_ = (255, 69, 0)
                         screen.fill((0, 0, 0))
                         maze.set_color((255, 255, 0))
                         maze.draw_level_1()
@@ -58,6 +59,7 @@ class Game():
 
                     if player.poziom == 2:
                         player.sterowanie(dx, dy)
+                        player.color_ = (255, 69, 0)
                         screen.fill((0, 0, 0))
                         maze.set_color((0, 255, 255))
                         maze.draw_level_2()
@@ -67,6 +69,7 @@ class Game():
                         player.draw()
                     if player.poziom == 3:
                         player.sterowanie(dx, dy)
+                        player.color_ = (255, 69, 0)
                         screen.fill((0, 0, 0))
                         maze.set_color((0, 255, 0))
                         maze.draw_level_3()
@@ -84,8 +87,20 @@ class Game():
                         player.win(screen)
                         player.napisy(screen, font_style)
                         player.draw()
+                    if player.poziom == 5:
+                        player.sterowanie(dx, dy)
+                        screen.fill((0, 0, 0))
+                        player.color_=(0, 255, 255)
+                        maze.set_color((255, 165, 0))
+                        maze.draw_level_5()
+                        maze.move()
+                        player.kolizje(maze.linie51)
+                        player.kolizje(maze.linie5)
+                        player.win(screen)
+                        player.napisy(screen, font_style)
+                        player.draw()
 
-                    if player.poziom > 4:
+                    if player.poziom > 5:
                         screen.fill((0, 255, 127))
                         text_win = font_style2.render("Wygrana!", True, (0, 0, 0))
                         self.napisy_sterowanie(screen, font_style)

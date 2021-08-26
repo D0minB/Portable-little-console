@@ -8,8 +8,13 @@ class Maze(pygame.Rect):
         self.linie2=[]
         self.linie3=[]
         self.linie4=[]
+        self.linie5=[]
+        self.linie51=[]
         self.color_=(0,0,0)
         self.width_=width
+        self.yg_ = -40
+        self.yd_ = 0
+        self.vy_ = 35
 
         self.linie.append((10, 200,10,320))
         self.linie.append((30, 220, 30, 320))
@@ -143,6 +148,50 @@ class Maze(pygame.Rect):
         self.linie4.append((345, 40, 350, 40))
         self.linie4.append((350, 0, 350, 40))
 
+        self.linie5.append((10, 260, 10, 320))
+        self.linie5.append((30, 280, 30, 320))
+        self.linie5.append((30, 280, 70, 280))
+        self.linie5.append((10, 260, 90, 260))
+        self.linie5.append((90, 260, 90, 290))
+        self.linie5.append((70, 280, 70, 310))
+        self.linie5.append((90, 290, 105, 290))
+        self.linie5.append((70, 310, 120, 310))
+        self.linie5.append((105, 150, 105, 290))
+        self.linie5.append((120, 170, 120, 310))
+        self.linie5.append((105, 150, 150, 150))
+        self.linie5.append((120, 170, 150, 170))
+        self.linie5.append((155, 150, 220, 150))
+        self.linie5.append((155, 170, 205, 170))
+        self.linie5.append((205, 170, 205, 260))
+        self.linie5.append((220, 150, 220, 245))
+        self.linie5.append((220, 245, 270, 245))
+        self.linie5.append((205, 260, 290, 260))
+        self.linie5.append((270, 190, 270, 245))
+        self.linie5.append((290, 210, 290, 260))
+        self.linie5.append((270, 190, 380, 190))
+        self.linie5.append((290, 210, 360, 210))
+        self.linie5.append((360, 210, 360, 300))
+        self.linie5.append((380, 190, 380, 280))
+        self.linie5.append((380, 280, 435, 280))
+        self.linie5.append((360, 300, 450, 300))
+        self.linie5.append((435, 160, 435, 280))
+        self.linie5.append((450, 140, 450, 300))
+        self.linie5.append((320, 140, 450, 140))
+        self.linie5.append((300, 160, 435, 160))
+        self.linie5.append((300, 55, 300, 160))
+        self.linie5.append((320, 70, 320, 140))
+        self.linie5.append((300, 55, 420, 55))
+        self.linie5.append((320, 70, 440, 70))
+        self.linie5.append((420, 30, 420, 55))
+        self.linie5.append((440, 10, 440, 70))
+        self.linie5.append((350, 10, 440, 10))
+        self.linie5.append((330, 30, 420, 30))
+        self.linie5.append((330, 0, 330, 30))
+        self.linie5.append((350, 0, 350, 10))
+
+        self.linie51.append((152, 140, 152, 180))
+
+
     def set_color(self,new_color):
         self.color_=new_color
     def draw_level_1(self):
@@ -157,3 +206,23 @@ class Maze(pygame.Rect):
     def draw_level_4(self):
      for block in self.linie4:
          pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)
+    def draw_level_5(self):
+     for block in self.linie5:
+         pygame.draw.line(self.screen_,self.color_,(block[0],block[1]),(block[2],block[3]),self.width_)
+
+
+    def move(self):
+        if self.yg_<320:
+            self.yg_ = self.yg_ + self.vy_
+            self.yd_ = self.yd_ + self.vy_
+            self.linie51=[]
+            self.linie51.append((152,self.yg_,152,self.yd_))
+            pygame.draw.line(self.screen_, self.color_, (152, self.yg_), (152, self.yd_), self.width_)
+        else:
+            self.yg_=-41
+            self.yd_=0
+
+
+
+
+

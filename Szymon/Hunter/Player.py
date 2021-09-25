@@ -36,7 +36,7 @@ class Player(pygame.sprite.Sprite):
         self.move(dx, dy)
 
     def napisy(self, screen, font_style):
-        text_zycia = font_style.render("Życia: " + str(self.zycia_), True, (255, 0, 0))
+        text_zycia = font_style.render("Życia: " + str(self.zycia_), True, (255, 255, 0))
         screen.blit(text_zycia, [0, 0])
-        text_zycia = font_style.render("Punkty: " + str(self.punkty_), True, (255, 0, 0))
+        text_zycia = font_style.render("Punkty: " + str(self.punkty_), True, (255, 255, 0))
         screen.blit(text_zycia, [0, 20])

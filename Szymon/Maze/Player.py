@@ -1,5 +1,4 @@
 import pygame
-import time
 class Player(pygame.Rect):
 
     def __init__(self,screen):
@@ -11,6 +10,7 @@ class Player(pygame.Rect):
         self.width_=6
         self.height_=6
         self.color_=(255, 69, 0)
+        self.counter_a=0
 
 
 

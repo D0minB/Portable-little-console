@@ -51,7 +51,7 @@ class Game():
                 if player.counter_a==0:
                     screen.blit(tlo_menu.image, tlo_menu.rect)
                     pygame.display.flip()
-                if pygame.key.get_pressed()[pygame.K_a] or player.counter_a==1:
+                if pygame.key.get_pressed()[pygame.K_r] or player.counter_a==1:
                     player.counter_a=1
                     if player.zycia > 0:
 

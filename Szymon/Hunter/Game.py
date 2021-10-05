@@ -31,7 +31,7 @@ class Game():
             pygame.quit()
             sys.exit()
         if pygame.key.get_pressed()[pygame.K_r]:
-            player.counter_a = 0
+            player.counter_a = 1
             player.zycia_ = 3
             player.punkty_ = 0
             player.x_ = 240
@@ -49,6 +49,7 @@ class Game():
         dy = 0
         dt = 0
         font_style = pygame.font.SysFont("dejavuserif", 20)
+        font_style2 = pygame.font.SysFont("dejavuserif", 20)
         size_szerokosc = 480
         size_wysokosc=320
         size=[size_szerokosc,size_wysokosc]
@@ -62,9 +63,6 @@ class Game():
         tlo_menu = pygame.sprite.Sprite()
         tlo_menu.image = pygame.image.load("menu.png").convert()
         tlo_menu.rect = tlo_menu.image.get_rect()
-        tlo_wygrana = pygame.sprite.Sprite()
-        tlo_wygrana.image = pygame.image.load("tlo_wygrana.png").convert()
-        tlo_wygrana.rect = tlo_wygrana.image.get_rect()
         tlo_porazka = pygame.sprite.Sprite()
         tlo_porazka.image = pygame.image.load("tlo_porazka.png").convert()
         tlo_porazka.rect = tlo_porazka.image.get_rect()
@@ -80,7 +78,7 @@ class Game():
                 if player.counter_a==0:
                     screen.blit(tlo_menu.image, tlo_menu.rect)
                     pygame.display.flip()
-                if pygame.key.get_pressed()[pygame.K_a] or player.counter_a==1:
+                if pygame.key.get_pressed()[pygame.K_r] or player.counter_a==1:
                     player.counter_a=1
                     if player.zycia_ > 0:
                         screen.blit(tlo_a.image, tlo_a.rect)
@@ -101,36 +99,8 @@ class Game():
                             player.punkty_ += 1
                     if player.zycia_ <= 0:
                         screen.blit(tlo_porazka.image, tlo_porazka.rect)
+                        text_zycia = font_style2.render(str(player.punkty_), True, (255, 255, 0))
+                        screen.blit(text_zycia, [230, 135])
                         self.sterowanie_oknem(player,shield)
                     pygame.display.update()
-
-                if pygame.key.get_pressed()[pygame.K_b] or player.counter_a==2:
-                    player.counter_a=2
-                    if player.zycia_ > 0:
-                        screen.blit(tlo_a.image, tlo_a.rect)
-                        player.sterowanie(dx, dy)
-                        shield.draw()
-                        player.draw()
-                        self.zmiany_v(player, shield)
-                        shield.move(player)
-                        player.napisy(screen, font_style)
-                        if shield.kolizja(player) == True:
-                            shield.x_ = -20
-                            shield.y_ = randrange(70, 270, 1)
-                            shield.dy_ = 0
-                            player.punkty_ += 1
-                        if player.punkty_>=6 and player.zycia_<2:
-                            heart.kolizja(player)
-                            heart.draw()
-                            heart.move(player)
-                        if player.punkty_ >= 12:
-                             screen.blit(tlo_wygrana.image, tlo_wygrana.rect)
-                             shield.dx_ = 0
-                             shield.dy_ = 0
-                             self.sterowanie_oknem(player,shield)
-                        if player.zycia_ <= 0:
-                             screen.blit(tlo_porazka.image, tlo_porazka.rect)
-                             self.sterowanie_oknem(player,shield)
-                    pygame.display.update()
-                    print([shield.dx_,player.punkty_])
         pygame.quit()

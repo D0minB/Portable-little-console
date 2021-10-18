@@ -3,6 +3,14 @@ from  Shield import Shield
 from random import randrange
 from  Player import Player
 from Heart import Heart
+import RPi.GPIO as GPIO
+adc = MCP3008()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 class Game():
     def zmiany_v(self,player,shield):
         if player.punkty_==1 or player.punkty_==2 or player.punkty_==0:

@@ -1,4 +1,12 @@
 import pygame
+import RPi.GPIO as GPIO
+adc = MCP3008()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 class Player(pygame.sprite.Sprite):
 
     def __init__(self,screen):
@@ -25,13 +33,13 @@ class Player(pygame.sprite.Sprite):
     def sterowanie(self,dx,dy):
         dx = 0
         dy = 0
-        if pygame.key.get_pressed()[pygame.K_LEFT]:
+        if pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=2) > 600 or GPIO.input(33) == 0:
             dx -= 9
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+        if pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=2) < 50 or GPIO.input(31) == 0:
             dx += 9
-        if pygame.key.get_pressed()[pygame.K_UP]:
+        if pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=1) < 50 or GPIO.input(32) == 0:
             dy -= 9
-        if pygame.key.get_pressed()[pygame.K_DOWN]:
+        if pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=1) > 600 or GPIO.input(37) == 0 :
             dy += 9
         self.move(dx, dy)
 

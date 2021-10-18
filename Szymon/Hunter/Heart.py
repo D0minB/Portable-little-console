@@ -1,6 +1,14 @@
 import pygame
 from random import randrange
 import time
+import RPi.GPIO as GPIO
+adc = MCP3008()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
 class Heart(pygame.sprite.Sprite):
 

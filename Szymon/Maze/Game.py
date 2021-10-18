@@ -3,6 +3,15 @@ import time
 import sys
 from Maze import Maze
 from  Player import Player
+from MCP3008_class import MCP3008
+import RPi.GPIO as GPIO
+adc = MCP3008()
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 class Game():
 
 

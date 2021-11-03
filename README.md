@@ -1,4 +1,10 @@
 # Portable little console
+
+<p align="left">
+  <img width="208" height="208" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/RAI_logo.png">
+</p>
+
+
 # KN RAI project
  
  **Authors**:
@@ -18,4 +24,7 @@
  - Pong 🎮 🏆
  - Hunter 🦆 🔫
  - Maze 🕹️ 📐
- 
+  <br /> <br />
+  
+
+

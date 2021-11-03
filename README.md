@@ -1,7 +1,8 @@
 # Portable little console
 
-<p align="left">
-  <img width="208" height="208" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/RAI_logo.png">
+<p align="center">
+  <img src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/RAI_logo.png">
+  <img src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Logo_PP.png">
 </p>
 
 

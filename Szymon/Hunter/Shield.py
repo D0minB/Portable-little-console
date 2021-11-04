@@ -1,5 +1,7 @@
 import pygame
 from random import randrange
+from MCP3008_class import MCP3008
+adc = MCP3008()
 class Shield(pygame.sprite.Sprite):
     def __init__(self,screen):
         self.image_= pygame.image.load("bird.png")
@@ -27,5 +29,5 @@ class Shield(pygame.sprite.Sprite):
 
     def kolizja(self,player):
         if pygame.Rect(player.x_,player.y_,player.szerokosc_,player.wysokosc_).colliderect(
-                pygame.Rect(self.x_-self.szerokosc_/2,self.y_-self.wysokosc_/2,self.szerokosc_,self.wysokosc_)) == True and  pygame.key.get_pressed()[pygame.K_SPACE]:
+                pygame.Rect(self.x_-self.szerokosc_/2,self.y_-self.wysokosc_/2,self.szerokosc_,self.wysokosc_)) == True and  (pygame.key.get_pressed()[pygame.K_SPACE] or adc.read(channel=0)==0):
             return True

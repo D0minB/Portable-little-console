@@ -4,13 +4,12 @@ from random import randrange
 from  Player import Player
 from Heart import Heart
 import RPi.GPIO as GPIO
+from MCP3008_class import MCP3008
 adc = MCP3008()
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP) #prawy
+GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP) #lewy
 class Game():
     def zmiany_v(self,player,shield):
         if player.punkty_==1 or player.punkty_==2 or player.punkty_==0:
@@ -35,10 +34,10 @@ class Game():
 
 
     def sterowanie_oknem(self,player,shield):
-        if pygame.key.get_pressed()[pygame.K_q]:
+        if pygame.key.get_pressed()[pygame.K_q]or GPIO.input(33) == 0:
             pygame.quit()
             sys.exit()
-        if pygame.key.get_pressed()[pygame.K_r]:
+        if pygame.key.get_pressed()[pygame.K_r]or GPIO.input(32) == 0:
             player.counter_a = 1
             player.zycia_ = 3
             player.punkty_ = 0
@@ -86,7 +85,7 @@ class Game():
                 if player.counter_a==0:
                     screen.blit(tlo_menu.image, tlo_menu.rect)
                     pygame.display.flip()
-                if pygame.key.get_pressed()[pygame.K_r] or player.counter_a==1:
+                if pygame.key.get_pressed()[pygame.K_r]or GPIO.input(32) == 0 or player.counter_a==1:
                     player.counter_a=1
                     if player.zycia_ > 0:
                         screen.blit(tlo_a.image, tlo_a.rect)

@@ -1,12 +1,11 @@
 import pygame
 from random import randrange
+from MCP3008_class import MCP3008
 import time
 import RPi.GPIO as GPIO
 adc = MCP3008()
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
 
@@ -36,7 +35,7 @@ class Heart(pygame.sprite.Sprite):
             self.y_ =-40
     def kolizja(self,player):
         if pygame.Rect(player.x_,player.y_,player.szerokosc_,player.wysokosc_).colliderect(
-                pygame.Rect(self.x_-self.szerokosc_/2,self.y_-self.wysokosc_/2,self.szerokosc_,self.wysokosc_)) == True and  pygame.key.get_pressed()[pygame.K_SPACE]:
+                pygame.Rect(self.x_-self.szerokosc_/2,self.y_-self.wysokosc_/2,self.szerokosc_,self.wysokosc_)) == True and  (pygame.key.get_pressed()[pygame.K_SPACE] or adc.read(channel=0)==0):
             player.zycia_+=1
             self.x_=self.x_ = randrange(70, 300, 1)
             self.y_ = -40

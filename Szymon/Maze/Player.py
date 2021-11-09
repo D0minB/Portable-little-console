@@ -5,8 +5,10 @@ adc = MCP3008()
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 
-GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+left_switch = 32
+right_switch = 33
+GPIO.setup(left_switch, GPIO.IN,pull_up_down=GPIO.PUD_UP)
+GPIO.setup(right_switch, GPIO.IN,pull_up_down=GPIO.PUD_UP)
 class Player(pygame.Rect):
 
     def __init__(self,screen):
@@ -35,14 +37,14 @@ class Player(pygame.Rect):
     def sterowanie(self,dx,dy):
         dx = 0
         dy = 0
-        if pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=5) > 600:
-            dx -= 4
-        if pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=5) < 50:
-            dx += 4
-        if pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=4) < 50:
-            dy -= 4
-        if pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=4) > 600:
-            dy += 4
+        if adc.read(channel=5) > 600:
+            dx += 2
+        if adc.read(channel=5) < 50:
+            dx -= 2
+        if adc.read(channel=4) < 50:
+            dy += 2
+        if adc.read(channel=4) > 600:
+            dy -= 2
         self.move(dx, dy)
 
     def kolizje(self, linie):
@@ -60,11 +62,9 @@ class Player(pygame.Rect):
                 self.zycia -= 1
 
     def win(self,screen):
-        pygame.draw.rect(screen, (255, 255, 255), [332, 0, 18, 10])
-        if pygame.Rect(self.x_, self.y_, self.width_, self.height_).colliderect(pygame.Rect(332, 0, 18, 10)) == True:
-            self.x_ = 16
-            self.y_ = 310
-            self.poziom += 1
+        self.x_ = 16
+        self.y_ = 310
+        self.poziom += 1
 
     def napisy(self,screen,font_style):
         text_zycia = font_style.render("Życia: " + str(self.zycia), True, (255, 0, 0))

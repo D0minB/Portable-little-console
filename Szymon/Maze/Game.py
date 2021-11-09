@@ -14,22 +14,22 @@ class Game():
 
 
     def sterowanie_oknem(self,player):
-        if pygame.key.get_pressed()[pygame.K_q] or GPIO.input(33) == 0:
+        if GPIO.input(32) == 0:
             pygame.quit()
             sys.exit()
-        if pygame.key.get_pressed()[pygame.K_r] or GPIO.input(32) == 0:
-            player.zycia = 3
-            player.poziom = 1
+        if GPIO.input(33) == 0:
+            game=Game()
 
     def __init__(self):
         pygame.init()
-
+        pygame.mouse.set_visible(0)
+        screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         clock = pygame.time.Clock()
 
-        screen = pygame.display.set_mode([480, 320])
+        #screen = pygame.display.set_mode([480, 320])
         player = Player(screen)
         maze = Maze(screen, width=2)
-        fps = 10.0
+        fps = 20.0
         dx = 0
         dy = 0
         dt = 0
@@ -45,76 +45,57 @@ class Game():
 
         font_style = pygame.font.SysFont("dejavuserif", 20)
 
-        running = True
-        while running:
+        
+        while True:
             dt += clock.tick() / 1000.0
             while dt > 1 / fps:
                 dt -= 1 / fps
-
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        running = False
-
+                
                 if player.counter_a==0:
                     screen.blit(tlo_menu.image, tlo_menu.rect)
                     pygame.display.flip()
-                if pygame.key.get_pressed()[pygame.K_r] or GPIO.input(32) == 0 or player.counter_a==1:
+                screen.fill((0, 0, 0))
+                if GPIO.input(32) == 0 or player.counter_a==1:
                     player.counter_a=1
                     if player.zycia > 0:
 
                         if player.poziom == 1:
-                            player.sterowanie(dx, dy)
                             player.color_ = (255, 69, 0)
-                            screen.fill((0, 0, 0))
                             maze.set_color((255, 255, 0))
                             maze.draw_level_1()
                             player.kolizje(maze.linie)
-                            player.win(screen)
-                            player.napisy(screen, font_style)
-                            player.draw()
 
                         if player.poziom == 2:
-                            player.sterowanie(dx, dy)
                             player.color_ = (255, 69, 0)
-                            screen.fill((0, 0, 0))
                             maze.set_color((0, 255, 255))
                             maze.draw_level_2()
                             player.kolizje(maze.linie2)
-                            player.win(screen)
-                            player.napisy(screen, font_style)
-                            player.draw()
                         if player.poziom == 3:
-                            player.sterowanie(dx, dy)
                             player.color_ = (255, 69, 0)
-                            screen.fill((0, 0, 0))
                             maze.set_color((0, 255, 0))
                             maze.draw_level_3()
                             player.kolizje(maze.linie3)
-                            player.win(screen)
-                            player.napisy(screen, font_style)
-                            player.draw()
                         if player.poziom == 4:
-                            player.sterowanie(dx, dy)
-                            screen.fill((0, 0, 0))
                             player.color_=	(0, 255, 255)
                             maze.set_color((255, 0, 0))
                             maze.draw_level_4()
                             player.kolizje(maze.linie4)
-                            player.win(screen)
-                            player.napisy(screen, font_style)
-                            player.draw()
                         if player.poziom == 5:
-                            player.sterowanie(dx, dy)
-                            screen.fill((0, 0, 0))
                             player.color_=(0, 255, 255)
                             maze.set_color((255, 165, 0))
                             maze.draw_level_5()
                             maze.move()
                             player.kolizje(maze.linie51)
                             player.kolizje(maze.linie5)
-                            player.win(screen)
-                            player.napisy(screen, font_style)
-                            player.draw()
+                            
+                        player.sterowanie(dx, dy)
+                        if pygame.Rect(player.x_, player.y_, player.width_, player.height_).colliderect(pygame.Rect(332, 0, 18, 10)) == True:
+                            player.win(screen, maze)
+                        
+                        player.napisy(screen, font_style)
+                        player.draw()
+                        #META
+                        pygame.draw.rect(screen, (255, 255, 255), [332, 0, 18, 10]) 
 
                         if player.poziom > 5:
                             screen.blit(tlo_wygrana.image, tlo_wygrana.rect)
@@ -126,5 +107,3 @@ class Game():
 
                     pygame.display.update()
 
-
-        pygame.quit()

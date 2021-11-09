@@ -4,11 +4,12 @@ import time
 from pygame.math import Vector2
 from random import randint
 import pygame
-#print(pygame.font.get_fonts())
 import sys
 from collections import Counter
 from MCP3008_class import MCP3008
 import RPi.GPIO as GPIO
+
+adc = MCP3008()
 
 
 class Block(pygame.sprite.Sprite):
@@ -66,16 +67,19 @@ pygame.init()
 pygame.mouse.set_visible(0)
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
-font20 = pygame.font.SysFont("calibri",20)
-font40 = pygame.font.SysFont("calibri",40)
-font30 = pygame.font.SysFont("calibri",30)
+font20 = pygame.font.SysFont("dejavuserif",20)
+font30 = pygame.font.SysFont("dejavuserif",30)
+font40 = pygame.font.SysFont("dejavuserif",40)
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(37,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(31,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP)
-GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP)
+left_switch = 32
+right_switch = 33
+GPIO.setup(left_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(right_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+prev_val_4 = adc.read(channel=4)
+prev_val_5 = adc.read(channel=5)
 
 
 def make_background():
@@ -106,21 +110,17 @@ def start_screen(background):
     screen.fill((0, 0, 0))
     background.draw(screen)
 
-    draw_text("SNAKE", font40, (122, 154, 175), Vector2((screen.get_width() / 2, 20)))
-    draw_text("Sterowanie przyciskami", font20, (255, 255, 255),
+    draw_text("SNAKE", font40, (122, 154, 175), Vector2((screen.get_width() / 2, 25)))
+    draw_text("STEROWANIE - LEWY JOYSTICK", font20, (255, 255, 255),
               Vector2(screen.get_width() / 2, screen.get_height() / 2 - 50))
-    draw_text("Przycisk 'lewo' - rozpocznij gre", font20, (255, 255, 255),
-              Vector2(screen.get_width() / 2, screen.get_height() / 2))
+    draw_text("Wciśnij lewy przycisk, aby rozpocząć grę", font20, (255, 255, 255),
+              Vector2(screen.get_width() / 2, screen.get_height() / 2 + 50))
 
     pygame.display.update()
 
     start_game = False
     while not start_game:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                pygame.quit()
-                sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0:
+        if GPIO.input(left_switch) == 0:
                 start_game = True 
 
 
@@ -128,8 +128,12 @@ def start_screen(background):
 def end_screen(points, record):
     screen.fill((0, 0, 0))
 
-    text = font20.render("Przycisk 'dol' - wyjdź, przycisk 'lewo' - nowa gra", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(screen.get_width() / 2, 260))
+    text = font20.render("Lewy przycisk - nowa gra", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(screen.get_width() / 2, 230))
+    screen.blit(text, text_rect)
+    
+    text = font20.render("Prawy przycisk - koniec gry", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(screen.get_width() / 2, 270))
     screen.blit(text, text_rect)
 
     if points > record:
@@ -147,12 +151,11 @@ def end_screen(points, record):
     pygame.display.update()
 
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q] or GPIO.input(32) == 0:
-                pygame.quit()
-                sys.exit()
-            if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0:
-                snake(False)
+        if GPIO.input(right_switch) == 0:
+            pygame.quit()
+            sys.exit()
+        elif GPIO.input(left_switch) == 0:
+            snake(False)
 
 
 def snake(start=True):
@@ -174,6 +177,7 @@ def snake(start=True):
     snake_body_group = pygame.sprite.Group()
     snake_head = Block(screen.get_width() / 2, screen.get_height() / 2, orientation_=direction, is_head=True)
     snake_head_group.add(snake_head)
+    
     for i in range(4):
         snake_body_group.add(
             Block(screen.get_width() / 2 + block_size * (i + 1), screen.get_height() / 2, orientation_=direction))
@@ -201,32 +205,18 @@ def snake(start=True):
 
         dt -= t2 - t1
 
-        dt += clock.tick() / 1000.0
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                pygame.quit()
-                sys.exit()
-            
+        dt += clock.tick() / 1000.0           
 
         while dt > 1 / fps:
             result_changed = False
-            
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                    pygame.quit()
-                    sys.exit()
                     
-            #if (adc.read(channel=2) < 50 or GPIO.input(31) == 0 ) and direction != "right":
-            if GPIO.input(31) == 0 and direction != "right":
+            if adc.read(channel=5) < 50 and prev_val_5 > 50 and direction != "right":
                 direction = "left"
-            #elif (adc.read(channel=2) > 600 or GPIO.input(33) == 0 ) and direction != "left":
-            elif GPIO.input(33) == 0  and direction != "left":
+            elif adc.read(channel=5) > 600 and prev_val_5 < 600 and direction != "left":
                 direction = "right"
-            #elif (adc.read(channel=1) > 600 or GPIO.input(37) == 0 ) and direction != "down":
-            elif GPIO.input(37) == 0  and direction != "down":
+            elif adc.read(channel=4) > 600 and prev_val_4 < 600 and direction != "down":
                 direction = "up"
-            #elif (adc.read(channel=1) < 50 or GPIO.input(32) == 0 ) and direction != "up":
-            elif GPIO.input(32) == 0  and direction != "up":
+            elif adc.read(channel=4) < 50 and prev_val_4 > 50 and direction != "up":
                 direction = "down"
                 
             dt -= 1 / fps
@@ -241,7 +231,7 @@ def snake(start=True):
                 pos.append(Vector2(obj.rect.x, obj.rect.y))
                 orientation.append(obj.get_orientation())
                 
-
+                
             # Head meet other snake part
             temp = Counter([tuple(x) for x in pos])
             unique_pos = [list(k) for k, v in temp.items() if v == 1]
@@ -299,22 +289,22 @@ def snake(start=True):
             if lvl_points >= next_level[lvl - 1]:
                 lvl += 1
                 lvl_points = 0
+                
+                draw_text("Punkty:  " + str(points) + "    Rekord:  " + str(record_info), font20, color,Vector2(135, 20))
+                draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font20, color, Vector2((screen.get_width() - 100, 20)))
 
-                draw_text("POZIOM " + str(lvl), font40, (255, 0, 0),
-                          Vector2(screen.get_width() / 2, screen.get_height() / 2))
-                draw_text("Naciśnij przycisk", font20, (255, 0, 0),
-                          Vector2(screen.get_width() / 2, screen.get_height() / 2 + 80))
+                draw_text("POZIOM " + str(lvl), font30, (255, 0, 0),Vector2(screen.get_width() / 2, 75))
+                draw_text("Naciśnij lewy przycisk, aby kontynuować", font20, (122,154,175),
+                          Vector2(screen.get_width() / 2, 120))
 
+                pygame.display.update()
                 # WAITING FOR SPACE PRESS
                 t1 = time.time()
                 start_level = False
                 while not start_level:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
-                            pygame.quit()
-                            sys.exit()
-                        if pygame.key.get_pressed()[pygame.K_SPACE] or GPIO.input(31) == 0 or GPIO.input(32) == 0 or GPIO.input(33) == 0 or GPIO.input(37) == 0:
-                            start_level = True
+                    if GPIO.input(left_switch) == 0:
+                        start_level = True
+                
                 t2 = time.time()
                 dt -= t2 - t1
 
@@ -327,9 +317,10 @@ def snake(start=True):
                     if i >= 3:
                         snake_body_group.remove(obj)
                     i += 1
-
+                    
                 first_frame = True
 
+                
             # DRAWING
             if points > record:
                 record_info = points
@@ -349,10 +340,13 @@ def snake(start=True):
             snake_head_group.draw(screen)
             snake_body_group.draw(screen)
             
+            prev_val_4 = adc.read(channel=4)
+            prev_val_5 = adc.read(channel=5)
+            
 
             if first_frame == True or result_changed == True:
-                draw_text("Punkty:  " + str(points) + "      Rekord:  " + str(record_info), font30, color,Vector2(135, 20))
-                draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font30, color, Vector2((screen.get_width() - 100, 20)))
+                draw_text("Punkty:  " + str(points) + "    Rekord:  " + str(record_info), font20, color,Vector2(135, 20))
+                draw_text("Poziom " + str(lvl) + "    " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font20, color, Vector2((screen.get_width() - 100, 20)))
 
             if first_frame == 1:
                 fruit_group.draw(screen)

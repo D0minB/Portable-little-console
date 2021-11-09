@@ -33,13 +33,13 @@ class Player(pygame.sprite.Sprite):
     def sterowanie(self,dx,dy):
         dx = 0
         dy = 0
-        if pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=4) > 600:
+        if pygame.key.get_pressed()[pygame.K_LEFT] or adc.read(channel=5) > 600:
             dx -= 9
-        if pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=4) < 50:
+        if pygame.key.get_pressed()[pygame.K_RIGHT] or adc.read(channel=5) < 50:
             dx += 9
-        if pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=5) < 50:
+        if pygame.key.get_pressed()[pygame.K_UP] or adc.read(channel=4) < 50:
             dy -= 9
-        if pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=5) > 600:
+        if pygame.key.get_pressed()[pygame.K_DOWN] or adc.read(channel=4) > 600:
             dy += 9
         self.move(dx, dy)
 

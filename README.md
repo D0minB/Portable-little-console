@@ -16,8 +16,8 @@
  
  **Components:** <br />
  ⚠️ Platform: Raspberry Pi Zero W \
- ADC converter: MCP3008 \
- Display: 3,5'' Waveshare 9904
+ 🔄 ADC converter: MCP3008 \
+ 📲 Display: 3,5'' Waveshare 9904
  <br /> <br />
 **Games**:   
  - Snake 🐍 🍎

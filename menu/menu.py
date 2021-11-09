@@ -92,8 +92,11 @@ def records():
     pygame.display.update()
 
     return_to_menu = False
+    prev_switch = GPIO.input(left_switch)
     while not return_to_menu:
-        if GPIO.input(left_switch) == 0:
+        prev_switch = GPIO.input(left_switch)
+        time.sleep(0.05)
+        if prev_switch == 1 and GPIO.input(left_switch) == 0:
             return_to_menu = True
             menu()
 
@@ -106,7 +109,7 @@ def games():
     offset = 40
     delta = 45
 
-    prev_val = adc.read(channel=5)
+    prev_val = adc.read(channel=4)
 
     for i in range(len(texts) - 1):
         if i == state:
@@ -118,12 +121,13 @@ def games():
 
     while True:
         update = False
-        if prev_val > 50 and adc.read(channel=5) < 50:
+        if prev_val > 50 and adc.read(channel=4) < 50:
             state += 1
             if state > 5:
                 state = 5
             update = True
-        elif prev_val < 600 and adc.read(channel=5) > 600:
+            
+        elif prev_val < 600 and adc.read(channel=4) > 600:
             state -= 1
             if state < 0:
                 state = 0
@@ -145,7 +149,7 @@ def games():
         if GPIO.input(left_switch) == 0 and state == 5:
             menu()
 
-        prev_val = adc.read(channel=5)
+        prev_val = adc.read(channel=4)
         time.sleep(0.05)
 
 
@@ -155,8 +159,7 @@ def menu():
     offset = 50
     delta = 70
     prev_switch = GPIO.input(left_switch)
-    prev_val = adc.read(channel=5)
-    #prev_up
+    prev_val = adc.read(channel=4)
 
     screen.fill((0, 0, 0))
     texts = ["NOWA GRA", "REKORDY", "MUZYKA: ON", "MUZYKA: OFF", "ZAMKNIJ"]
@@ -175,18 +178,20 @@ def menu():
     while True:
         update = False
 
-        if prev_val > 50 and adc.read(channel=5) < 50:
+        if prev_val > 50 and adc.read(channel=4) < 50:
             update = True
             state += 1
             if state > 3:
                 state = 3
-        elif prev_val < 600 and adc.read(channel=5) > 600:
+            
+        elif prev_val < 600 and adc.read(channel=4) > 600:
             update = True
             state -= 1
             if state < 0:
                 state = 0
+            
 
-        if prev_switch and GPIO.input(left_switch) == 0 and state == 0:
+        if prev_switch == 1 and GPIO.input(left_switch) == 0 and state == 0:
             games()
 
         elif GPIO.input(left_switch) == 0 and state == 1:
@@ -228,7 +233,7 @@ def menu():
             pygame.display.update()
 
         prev_switch = GPIO.input(left_switch)
-        prev_val = adc.read(channel=5)
+        prev_val = adc.read(channel=4)
         time.sleep(0.05)
 
 

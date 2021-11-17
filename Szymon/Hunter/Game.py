@@ -56,7 +56,6 @@ class Game():
         dy = 0
         dt = 0
         font_style = pygame.font.SysFont("dejavuserif", 20)
-        font_style2 = pygame.font.SysFont("dejavuserif", 20)
         size_szerokosc = 480
         size_wysokosc=320
         size=[size_szerokosc,size_wysokosc]
@@ -106,7 +105,7 @@ class Game():
                             player.punkty_ += 1
                     if player.zycia_ <= 0:
                         screen.blit(tlo_porazka.image, tlo_porazka.rect)
-                        text_zycia = font_style2.render(str(player.punkty_), True, (255, 255, 0))
+                        text_zycia = font_style.render(str(player.punkty_), True, (255, 255, 0))
                         screen.blit(text_zycia, [230, 135])
                         self.sterowanie_oknem(player,shield)
                     pygame.display.update()

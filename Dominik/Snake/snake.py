@@ -10,6 +10,10 @@ from MCP3008_class import MCP3008
 import RPi.GPIO as GPIO
 
 adc = MCP3008()
+buzzer_pin = 37
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(buzzer_pin, GPIO.OUT)
 
 
 class Block(pygame.sprite.Sprite):
@@ -126,6 +130,17 @@ def start_screen(background):
 
 
 def end_screen(points, record):
+    buzzer = GPIO.PWM(buzzer_pin, 1000)
+    buzzer.start(50)
+    notes = [300, 200, 150, 100]
+    t = [0.2, 0.2, 0.2, 0.2]
+    
+    for i in range(len(notes)):
+        buzzer.ChangeFrequency(notes[i])
+        time.sleep(t[i])
+    
+    buzzer.stop()
+
     screen.fill((0, 0, 0))
     draw_text("Lewy przycisk - nowa gra", font20, (255, 255, 255), Vector2(screen.get_width() / 2, 230))
     draw_text("Prawy przycisk - koniec gry", font20, (255, 255, 255), Vector2(screen.get_width() / 2, 270))
@@ -152,6 +167,8 @@ def end_screen(points, record):
 
 
 def snake(start=True):
+    buzzer = GPIO.PWM(buzzer_pin, 1000)
+    t_buzzer = time.time()
     dt = 0.0
     fps = 6.0
     clock = pygame.time.Clock()
@@ -242,10 +259,17 @@ def snake(start=True):
             # GAME END
             for head in snake_head_group:
                 if head.rect.x < block_size or head.rect.x > screen.get_width() - 2 * block_size or head.rect.y < 3 * block_size or head.rect.y > screen.get_height() - 2 * block_size:
+                    buzzer.stop()
                     end_screen(points, record)
 
+            if time.time() - t_buzzer > 0.2:
+                buzzer.stop()
+                
             # THE SNAKE EATS THE FRUIT
             if snake_head.rect.colliderect(fruit.rect) == 1:
+                buzzer.ChangeFrequency(600) #or 300
+                buzzer.start(50) # Set dutycycle to 50
+                t_buzzer = time.time()
                 points += 1
                 lvl_points += 1
                 result_changed = True

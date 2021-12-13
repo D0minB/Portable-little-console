@@ -1,11 +1,10 @@
-# Portable little console
+# <p align="center"> Portable little console </center> 
 
 <p align="center">
   <img width="350" height="350" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/RAI_logo.png">
-  <img width="350" height="350" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Logo_PP.png">
-  <img width="350" height="350" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Konsola.png">
-</p>
-
+  <img width="350" height="350" padding-right:10px" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Logo_PP.png"> 
+  <img  width="709" height="457" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Konsola.png">
+</p> </p>
 
 # KN RAI project
  

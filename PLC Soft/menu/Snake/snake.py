@@ -1,10 +1,8 @@
 # SNAKE
 # AUTHOR: DOMINIK BOGIELCZYK
-import time
+import time, pygame, sys, os
 from pygame.math import Vector2
 from random import randint
-import pygame
-import sys
 from collections import Counter
 from MCP3008_class import MCP3008
 import RPi.GPIO as GPIO
@@ -20,6 +18,7 @@ GPIO.setup(buzzer_pin, GPIO.OUT)
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, orientation_, is_head=False, is_fruit=False):
+        os.chdir('/home/pi/Desktop/main/menu/Snake')
         super().__init__()
         self.orientation = orientation_
         if is_head == 0 and is_fruit == 0:
@@ -162,7 +161,7 @@ def end_screen(points, record):
 
     while True:
         if GPIO.input(right_switch) == 0:
-            menu.menu()
+            menu.games()
         elif GPIO.input(left_switch) == 0:
             snake(False)
 

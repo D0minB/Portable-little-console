@@ -1,15 +1,15 @@
 # PLANE GAME
 # AUTHOR: DOMINIK BOGIELCZYK
 
-import pygame
+import pygame, time, sys, os, random
 from pygame.math import Vector2
-import time
-import sys
-import random
 import RPi.GPIO as GPIO
 from plane_class import Plane
 from MCP3008_class import MCP3008
-import concurrent.futures
+
+sys.path.insert(0, '/home/pi/Desktop/main/menu')
+import menu
+
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
@@ -69,8 +69,10 @@ def end_screen(new_record, points):
     screen.fill((0, 0, 0))
 
     if new_record == 1:
-        f = open("record.txt", "w")
+        os.chdir('/home/pi/Desktop/main/menu/Plane')
+        f = open("plane_record.txt", "w")
         f.write(str(points))
+        f.close()
 
         draw_text(font40, "NOWY REKORD", (0, 255, 0), Vector2(screen.get_width() / 2, 75))
         draw_text(font50, str(points), (0, 255, 0), Vector2(screen.get_width() / 2, 150))
@@ -87,8 +89,7 @@ def end_screen(new_record, points):
         if GPIO.input(left_switch) == 0:
             plane_game()
         elif GPIO.input(right_switch) == 0:
-            pygame.quit()
-            sys.exit()
+            menu.games()
 
 
 def plane_game():
@@ -132,7 +133,8 @@ def plane_game():
     targets_generating()
 
     # READ RECORD FROM FILE
-    with open("record.txt") as f:
+    os.chdir('/home/pi/Desktop/main/menu/Plane')
+    with open("plane_record.txt") as f:
         record = list(f)
         record = ''.join(record)  # converting list into string
         record = int(record)
@@ -157,11 +159,14 @@ def plane_game():
 
             # plane move
             delta_x = 0
+            delta = (int)(Tp*200)
+            if delta<10:
+                 delta = 10
             # plane controlling
             if adc.read(channel=5) < 50:
-                delta_x -= (int)(Tp*200)
+                delta_x -= delta
             if adc.read(channel=5) > 600:
-                delta_x += (int)(Tp*200)
+                delta_x += delta
             plane.move(delta_x)
 
             to_update = []
@@ -269,4 +274,4 @@ def plane_game():
             first_frame = 0
 
 
-plane_game()
+

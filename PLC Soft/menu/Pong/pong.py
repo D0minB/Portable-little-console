@@ -4,6 +4,10 @@ from pygame.math import Vector2
 import random
 from spidev import SpiDev
 
+sys.path.insert(0, '/home/pi/Desktop/main/menu')
+import menu
+
+
 class MCP3008:
     def __init__(self, bus=1, device=2):
         self.bus, self.device = bus, device
@@ -156,7 +160,7 @@ class Pingpong(object):
                 if event.type == pg.QUIT:
                     sys.exit(0)
                 elif event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:
-                    sys.exit(0)
+                    menu.games()
 
             #Ticks
             self.FPSdelta += self.FPSclock.tick() / 1000.0

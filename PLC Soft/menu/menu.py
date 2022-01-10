@@ -13,6 +13,10 @@ sys.path.insert(0 , '/home/pi/Desktop/main/menu/Snake')
 import snake
 sys.path.insert(0 , '/home/pi/Desktop/main/menu/Pong')
 import pong
+sys.path.insert(0 , '/home/pi/Desktop/main/menu/Plane')
+import plane
+sys.path.insert(0 , '/home/pi/Desktop/main/menu/Hunter')
+import HunterGame
 
 # Open SPI bus
 spi = spidev.SpiDev()
@@ -42,6 +46,7 @@ pygame.init()
 pygame.mouse.set_visible(0)
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 
+os.chdir('/home/pi/Desktop/main/menu')
 font10 = pygame.font.Font("font/KOMTITBR.ttf", 10)
 font15 = pygame.font.Font("font/KOMTITBR.ttf", 15)
 font20 = pygame.font.Font("font/KOMTITBR.ttf", 20)
@@ -63,27 +68,27 @@ def draw_text(text, font, color, position):
 
 def records():
     texts = ["HUNTER", "MAZE", "SNAKE", "PONG", "PLANE"]
-
-    with open("hunter_record.txt") as f:
+    os.chdir('/home/pi/Desktop/main/menu')
+    with open("Hunter/hunter_record.txt") as f:
         hunter_record = list(f)
         hunter_record = ''.join(hunter_record)  # converting list into string
-        hunter_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("hunter_record.txt")))
-    with open("/Maze/maze_record.txt") as f:
+        hunter_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("Hunter/hunter_record.txt")))
+    with open("Maze/maze_record.txt") as f:
         maze_record = list(f)
         maze_record = ''.join(maze_record)
-        maze_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("maze_record.txt")))
-    with open("/Snake/snake_record.txt") as f:
+        maze_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("Maze/maze_record.txt")))
+    with open("Snake/snake_record.txt") as f:
         snake_record = list(f)
         snake_record = ''.join(snake_record)
-        snake_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("snake_record.txt")))
-    with open("/Pong/pong_record.txt") as f:
+        snake_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("Snake/snake_record.txt")))
+    with open("Pong/pong_record.txt") as f:
         pong_record = list(f)
         pong_record = ''.join(pong_record)
-        pong_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("pong_record.txt")))
-    with open("plane_record.txt") as f:
+        pong_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("Pong/pong_record.txt")))
+    with open("Plane/plane_record.txt") as f:
         plane_record = list(f)
         plane_record = ''.join(plane_record)
-        plane_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("plane_record.txt")))
+        plane_date = time.strftime('%d/%m/%Y', time.localtime(os.path.getmtime("Plane/plane_record.txt")))
 
     points = [hunter_record, maze_record, snake_record, pong_record, plane_record]
     dates = [hunter_date, maze_date, snake_date, pong_date, plane_date]
@@ -125,6 +130,7 @@ def games():
             draw_text(texts[i], font25, yellow, Vector2(screen.get_width() / 2, offset + delta * i))
     draw_text(texts[5], font25, grey, Vector2(screen.get_width() / 2, offset + delta * 5))
     pygame.display.update()
+    time.sleep(0.2)
 
     while True:
         update = False
@@ -152,8 +158,9 @@ def games():
                         draw_text(texts[i], font25, yellow, Vector2(screen.get_width() / 2, offset + delta * i))
 
             pygame.display.update()
-
-        #if GPIO.input(left_switch) == 0 and state == 0:
+        
+        if GPIO.input(left_switch) == 0 and state == 0:
+            HunterGame.HunterGame()
 
         if GPIO.input(left_switch) == 0 and state == 1:
             Game.Game()
@@ -164,9 +171,11 @@ def games():
         if GPIO.input(left_switch) == 0 and state == 3:
             pong.Pingpong()
 
-        #if GPIO.input(left_switch) == 0 and state == 4:
+        if GPIO.input(left_switch) == 0 and state == 4:
+            plane.plane_game()
 
-        #if GPIO.input(left_switch) == 0 and state == 5:
+        if GPIO.input(left_switch) == 0 and state == 5:
+            menu()
 
         prev_val = adc.read(channel=4)
         time.sleep(0.05)

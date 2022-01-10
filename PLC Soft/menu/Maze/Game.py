@@ -1,6 +1,4 @@
-import pygame
-import time
-import sys
+import pygame, time, sys, os
 from Maze import Maze
 from  Player import Player
 from MCP3008_class import MCP3008
@@ -14,12 +12,11 @@ GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(33,GPIO.IN,pull_up_down=GPIO.PUD_UP) #prawy
 GPIO.setup(32,GPIO.IN,pull_up_down=GPIO.PUD_UP) #lewy
+
 class Game():
-
-
     def sterowanie_oknem(self,player):
         if GPIO.input(32) == 0:
-            menu.menu()
+            menu.games()
         if GPIO.input(33) == 0:
             game=Game()
 
@@ -37,9 +34,11 @@ class Game():
         dy = 0
         dt = 0
         tlo_menu = pygame.sprite.Sprite()
+        os.chdir('/home/pi/Desktop/main/menu')
         tlo_menu.image = pygame.image.load("menu.png").convert()
         tlo_menu.rect = tlo_menu.image.get_rect()
         tlo_wygrana = pygame.sprite.Sprite()
+        os.chdir('/home/pi/Desktop/main/menu/Maze')
         tlo_wygrana.image = pygame.image.load("tlo_wygrana.png").convert()
         tlo_wygrana.rect = tlo_wygrana.image.get_rect()
         tlo_porazka = pygame.sprite.Sprite()

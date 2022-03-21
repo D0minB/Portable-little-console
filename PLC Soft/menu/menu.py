@@ -7,15 +7,15 @@ import RPi.GPIO as GPIO
 import spidev
 from MCP3008_class import MCP3008
 
-sys.path.insert(0 , '/home/pi/Desktop/main/menu/Maze')
+sys.path.insert(0, '/home/pi/Desktop/main/menu/Maze')
 import Game
-sys.path.insert(0 , '/home/pi/Desktop/main/menu/Snake')
+sys.path.insert(0, '/home/pi/Desktop/main/menu/Snake')
 import snake
-sys.path.insert(0 , '/home/pi/Desktop/main/menu/Pong')
+sys.path.insert(0, '/home/pi/Desktop/main/menu/Pong')
 import pong
-sys.path.insert(0 , '/home/pi/Desktop/main/menu/Plane')
+sys.path.insert(0, '/home/pi/Desktop/main/menu/Plane')
 import plane
-sys.path.insert(0 , '/home/pi/Desktop/main/menu/Hunter')
+sys.path.insert(0, '/home/pi/Desktop/main/menu/Hunter')
 import HunterGame
 
 # Open SPI bus
@@ -183,23 +183,17 @@ def games():
 
 def menu():
     state = 0
-    sound = 0
     offset = 50
-    delta = 70
+    delta = 100
     prev_switch = GPIO.input(left_switch)
     prev_val = adc.read(channel=4)
 
     screen.fill((0, 0, 0))
-    texts = ["NOWA GRA", "REKORDY", "MUZYKA: ON", "MUZYKA: OFF", "ZAMKNIJ"]
+    texts = ["NOWA GRA", "REKORDY", "ZAMKNIJ"]
 
-    draw_text(texts[0], font40, green, Vector2(screen.get_width() / 2, offset + 70 * 0))
-    draw_text(texts[1], font40, yellow, Vector2(screen.get_width() / 2, offset + 70 * 1))
-    if sound:
-        draw_text(texts[2], font40, yellow, Vector2(screen.get_width() / 2, offset + 70 * 2))
-    else:
-        draw_text(texts[3], font40, yellow, Vector2(screen.get_width() / 2, offset + 70 * 2))
-
-    draw_text(texts[4], font40, yellow, Vector2(screen.get_width() / 2, offset + 70 * 3))
+    draw_text(texts[0], font40, green, Vector2(screen.get_width() / 2, offset))
+    draw_text(texts[1], font40, yellow, Vector2(screen.get_width() / 2, offset + delta))
+    draw_text(texts[2], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * 2))
 
     pygame.display.update()
 
@@ -209,8 +203,8 @@ def menu():
         if prev_val > 50 and adc.read(channel=4) < 50:
             update = True
             state += 1
-            if state > 3:
-                state = 3
+            if state > 2:
+                state = 2
 
         elif prev_val < 600 and adc.read(channel=4) > 600:
             update = True
@@ -218,45 +212,29 @@ def menu():
             if state < 0:
                 state = 0
 
-
         if prev_switch == 1 and GPIO.input(left_switch) == 0 and state == 0:
             games()
 
         elif GPIO.input(left_switch) == 0 and state == 1:
             records()
 
-        if prev_switch == 1 and GPIO.input(left_switch) == 0 and state == 2:
-            sound = not sound
-            update = True
-
-        if GPIO.input(left_switch) == 0 and state == 3:
-            pygame.quit()
-            sys.exit()
+        elif GPIO.input(left_switch) == 0 and state == 2:
+            pygame.quit()   
+            os.system("sudo shutdown -h now")
 
         if update:
             screen.fill((0, 0, 0))
-            for i in range(3):
+            for i in range(2):
                 if i != 2:
                     if i == state:
                         draw_text(texts[i], font40, green, Vector2(screen.get_width() / 2, offset + delta * i))
                     else:
                         draw_text(texts[i], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * i))
-                else:
-                    if i == state:
-                        if sound:
-                            draw_text(texts[2], font40, green, Vector2(screen.get_width() / 2, offset + delta * i))
-                        else:
-                            draw_text(texts[3], font40, green, Vector2(screen.get_width() / 2, offset + delta * i))
-                    else:
-                        if sound:
-                            draw_text(texts[2], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * i))
-                        else:
-                            draw_text(texts[3], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * i))
 
-                if state == 3:
-                    draw_text(texts[4], font40, red, Vector2(screen.get_width() / 2, offset + delta * 3))
+                if state == 2:
+                    draw_text(texts[2], font40, red, Vector2(screen.get_width() / 2, offset + delta * 2))
                 else:
-                    draw_text(texts[4], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * 3))
+                    draw_text(texts[2], font40, yellow, Vector2(screen.get_width() / 2, offset + delta * 2))
 
             pygame.display.update()
 

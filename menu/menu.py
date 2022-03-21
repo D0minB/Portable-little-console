@@ -219,7 +219,7 @@ def menu():
             records()
 
         elif GPIO.input(left_switch) == 0 and state == 2:
-            pygame.quit()
+            pygame.quit()   
             os.system("sudo shutdown -h now")
 
         if update:

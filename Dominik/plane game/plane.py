@@ -1,41 +1,52 @@
 # PLANE GAME
 # AUTHOR: DOMINIK BOGIELCZYK
 
+import os
+import sys
+import time
+import random
+import concurrent.futures
+
 import pygame
 from pygame.math import Vector2
-import time
-import sys
-import random
 import RPi.GPIO as GPIO
 from plane_class import Plane
 from MCP3008_class import MCP3008
-import concurrent.futures
 
+sys.path.insert(0, '/home/pi/Desktop/main/menu')
+import menu
+
+# GPIO config
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-left_switch = 32
-right_switch = 33
-GPIO.setup(left_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(right_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+CONST_LEFT_SWITCH = 32
+CONST_RIGHT_SWITCH = 33
+GPIO.setup(CONST_LEFT_SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(CONST_RIGHT_SWITCH, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
+# Pygame init
 pygame.init()
 screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.mouse.set_visible(0)
+screen_width = screen.get_width()
+screen_height = screen.get_height()
 
+# Fonts init
 font15 = pygame.font.SysFont("dejavuserif", 15)
 font20 = pygame.font.SysFont("dejavuserif", 20)
 font40 = pygame.font.SysFont("dejavuserif", 40)
 font50 = pygame.font.SysFont("dejavuserif", 50)
 
+# MCP3008 init
 adc = MCP3008()
 
 
 def draw_text(font, text, color, pos):
-    t = font.render(text, False, color)
-    text_rect = t.get_rect(center=(pos.x, pos.y))
-    screen.blit(t, text_rect)
-    pygame.display.update(text_rect.x, text_rect.y, text_rect.width, text_rect.height)
-
+    rendered_text = font.render(text, False, color)
+    text_rect = rendered_text.get_rect(center=pos)
+    screen.blit(rendered_text, text_rect)
+    pygame.display.update(text_rect)
+    
 
 def start_screen(plane):
     screen.fill((0, 0, 0))
@@ -43,25 +54,25 @@ def start_screen(plane):
     w = 16 * 22 + 8
 
     pygame.draw.lines(screen, (255, 255, 255), False,
-                      [(width / 2, width / 2), (width / 2, screen.get_height()),
-                       (w + width / 2, screen.get_height()), (w + width / 2, width / 2)], width)
+                      [(width / 2, width / 2), (width / 2, screen_height),
+                       (w + width / 2, screen_height), (w + width / 2, width / 2)], width)
     plane.draw()
 
     draw_text(font40, "PLANE", (255, 255, 255), Vector2((w / 2, 30)))
     draw_text(font20, "STEROWANIE:", (255, 255, 0),
-              Vector2(w / 2, screen.get_height() / 2 - 50))
+              Vector2(w / 2, screen_height / 2 - 50))
     draw_text(font15, "STRZAŁ - LEWY PRZYCISK", (255, 255, 0),
-              Vector2(w / 2, screen.get_height() / 2 - 20))
+              Vector2(w / 2, screen_height / 2 - 20))
     draw_text(font15, "RUCH LEWO-PRAWO - LEWY JOYSTICK", (255, 255, 0),
-              Vector2(w / 2, screen.get_height() / 2 + 10))
+              Vector2(w / 2, screen_height / 2 + 10))
     draw_text(font15, "LEWY PRZYCISK - ROZPOCZNIJ GRĘ", (255, 255, 255),
-              Vector2(w / 2, screen.get_height() / 2 + 60))
+              Vector2(w / 2, screen_height / 2 + 60))
 
     pygame.display.update()
 
     start_game = False
     while not start_game:
-        if GPIO.input(left_switch) == 0:
+        if GPIO.input(CONST_LEFT_SWITCH) == 0:
             start_game = True
 
 
@@ -69,45 +80,36 @@ def end_screen(new_record, points):
     screen.fill((0, 0, 0))
 
     if new_record == 1:
-        f = open("record.txt", "w")
+        f = open("plane_record.txt", "w")
         f.write(str(points))
 
-        draw_text(font40, "NOWY REKORD", (0, 255, 0), Vector2(screen.get_width() / 2, 75))
-        draw_text(font50, str(points), (0, 255, 0), Vector2(screen.get_width() / 2, 150))
+        draw_text(font40, "NOWY REKORD", (0, 255, 0), Vector2(screen_width / 2, 75))
+        draw_text(font50, str(points), (0, 255, 0), Vector2(screen_width / 2, 150))
 
     else:
-        draw_text(font40, "TWÓJ WYNIK:", (255, 255, 0), Vector2(screen.get_width() / 2, 75))
-        draw_text(font50, str(points), (255, 255, 0), Vector2(screen.get_width() / 2, 150))
+        draw_text(font40, "TWÓJ WYNIK:", (255, 255, 0), Vector2(screen_width / 2, 75))
+        draw_text(font50, str(points), (255, 255, 0), Vector2(screen_width / 2, 150))
 
-    draw_text(font20, "Lewy przycisk - nowa gra", (255, 255, 255), Vector2(screen.get_width() / 2, 230))
-    draw_text(font20, "Prawy przycisk - koniec gry", (255, 255, 255), Vector2(screen.get_width() / 2, 270))
+    draw_text(font20, "Lewy przycisk - nowa gra", (255, 255, 255), Vector2(screen_width / 2, 230))
+    draw_text(font20, "Prawy przycisk - koniec gry", (255, 255, 255), Vector2(screen_width / 2, 270))
     pygame.display.update()
 
     while True:
-        if GPIO.input(left_switch) == 0:
+        if GPIO.input(CONST_LEFT_SWITCH) == 0:
             plane_game()
-        elif GPIO.input(right_switch) == 0:
-            pygame.quit()
-            sys.exit()
+        elif GPIO.input(CONST_RIGHT_SWITCH) == 0:
+            menu.games()
+            
+
+# NEW TARGETS GENERATING
+def targets_generating(targets):
+    new_targets_pos = random.sample(range(1, 15), random.randint(4, 7))  # 4 TO 7 - NUMBER OF THE NEW TARGETS, 1 TO 14 - location range
+    targets.extend(pygame.Rect(pos * 22 + 8, 8, 20, 20) for pos in new_targets_pos)
+    
+    return targets
 
 
 def plane_game():
-    # NEW TARGETS GENERATING
-    def targets_generating():
-        new_targets_pos = []
-        for i in range(random.randint(4, 7)):  # 4 TO 7 - NUMBER OF THE NEW TARGETS
-            n = random.randint(1, 14)  # new target position choosing
-
-            while n in new_targets_pos:  # ADD UNIQUE POSITION OF THE TARGET
-                n = random.randint(1, 14)
-
-            new_targets_pos.append(n)
-
-        for target_pos in new_targets_pos:  # ADD UNIQUE TARGETS TO LIST
-            targets.append(pygame.Rect(target_pos * 22 + 8, 8, 20, 20))
-
-        return targets
-
     dt = 0.0
     Tp = 0.0
     fps = 50.0
@@ -129,10 +131,10 @@ def plane_game():
     bullets_velocity = 11
 
     # GENERATE FIRST TARGETS
-    targets_generating()
+    targets = targets_generating([])
 
     # READ RECORD FROM FILE
-    with open("record.txt") as f:
+    with open("plane_record.txt") as f:
         record = list(f)
         record = ''.join(record)  # converting list into string
         record = int(record)
@@ -145,53 +147,46 @@ def plane_game():
         t1 = time.time()
         if start:
             start_screen(plane)
-        start = False
+            start = False
 
         dt -= Tp
 
+
         while dt > 1 / fps:
-            result_change = 0
+            result_change = 1
             #dt -= 1 / fps
-            targets_move = 0
+            targets_move = 1
             t1 = time.time()
 
             # plane move
             delta_x = 0
-            # plane controlling
+            
+            # plane control
             if adc.read(channel=5) < 50:
-                delta_x -= (int)(Tp*200)
+                delta_x -= 22 #(int)(Tp*200)
             if adc.read(channel=5) > 600:
-                delta_x += (int)(Tp*200)
+                delta_x += 22 #(int)(Tp*200)
             plane.move(delta_x)
 
-            to_update = []
-
+     
             # collision - target and bullet
+            bullet_rect = pygame.Rect(0, 0, 10, 10)
             for bullet in bullets:
-                index = pygame.Rect(bullet.x - 5, bullet.y - 5 - bullets_velocity, 10, 10).collidelist(targets)
+                bullet_rect.topleft = (bullet.x - 5, bullet.y - 5 - bullets_velocity)
+                index = bullet_rect.collidelist(targets)
 
                 if index >= 0:
-                    to_update.append(pygame.Rect(targets[index]))
-                    to_update.append(pygame.Rect(bullet.x - 5, bullet.y - 5, 10, 10))
                     targets.pop(index)  # remove target
                     bullet.x = -30
                     points += 1
                     result_change = True
 
-            for i in range(len(bullets)):
-                if i < len(bullets):
-                    if bullets[i].x == -30:
-                        bullets.pop(i)
+            # remove bullets after collision and out of screen bullets
+            bullets = [bullet for bullet in bullets if bullet.x != -30 or bullet.y - 5 < bullets_velocity + 10]
 
-            # remove out of screen bullets
-            for i in range(len(bullets)):
-                if i < len(bullets):
-                    if bullets[i].y - 5 < bullets_velocity + 10:
-                        to_update.append(pygame.Rect(bullets[i].x - 5, bullets[i].y - 5, 10, 10))
-                        bullets.pop(i)
 
             # new bullet
-            if time.time() - last_bullets_time > new_bullets_time and GPIO.input(left_switch) == 0:
+            if time.time() - last_bullets_time > new_bullets_time and GPIO.input(CONST_LEFT_SWITCH) == 0:
                 last_bullets_time = time.time()
                 bullets.append(Vector2(plane.get_position()[0] + 10, plane.get_position()[1] - 10))
 
@@ -206,7 +201,7 @@ def plane_game():
                     target.y += 22
 
                 # generate new targets
-                targets_generating()
+                targets = targets_generating(targets)
 
             # bullets move in y-axis
             for bullet in bullets:
@@ -216,57 +211,49 @@ def plane_game():
             screen.fill((0, 0, 0))
 
             plane.draw()
-            plane.update(delta_x)
 
+            # bullets draw
+            bullet_rect = pygame.Rect(0, 0, 10, 10)
             for bullet in bullets:
                 pygame.draw.circle(screen, (255, 20, 0), [int(bullet.x), int(bullet.y)], 5)
-                # bullet in actual position and erase bullet in previous position
-                to_update.append(pygame.Rect(bullet.x - 5, bullet.y - 5, 10, 10 + bullets_velocity))
+                
+            # targets draw
+            for t in targets:
+                pygame.draw.rect(screen, (255, 255, 0), t)
 
             plane_position = plane.get_position()
-
+            
             # game end
             if len(targets) > 0 and targets[0].y > plane_position.y - 15:
                 end_screen(new_record, points)
 
-            if targets_move or first_frame:
-                for t in targets:
-                    y = t.y - 22
-                    if y < 0:
-                        y = 0
-                    to_update.append(pygame.Rect(t.x, y, 20, 20 + 22))
-                    pygame.draw.rect(screen, (255, 255, 0), t)
+            width = 6
+            
+            pygame.draw.lines(screen, (255, 255, 255), False,
+                                  [(width / 2, width / 2), (width / 2, screen_height - width / 2),
+                                   (16 * 22 + 8 + width / 2, screen_height - width / 2),
+                                   (16 * 22 + 8 + width / 2, width / 2)], 
+                                   width)
 
-            if first_frame:
-                # frame
-                width = 6
-                pygame.draw.lines(screen, (255, 255, 255), False,
-                                  [(width / 2, width / 2), (width / 2, screen.get_height() - width / 2),
-                                   (16 * 22 + 8 + width / 2, screen.get_height() - width / 2),
-                                   (16 * 22 + 8 + width / 2, width / 2)], width)
+            draw_text(font20, "REKORD", (255, 255, 0), Vector2(screen_width - 55, 100))
+            draw_text(font20, "PKT.", (255, 255, 0), Vector2(screen_width - 55, screen_height / 2 + 90))
 
-                draw_text(font20, "REKORD", (255, 255, 0), Vector2(screen.get_width() - 55, 100))
-                draw_text(font50, str(record), (255, 255, 0), Vector2(screen.get_width() - 55, 50))
-                draw_text(font20, "PKT.", (255, 255, 0), Vector2(screen.get_width() - 55, screen.get_height() / 2 + 90))
-                pygame.display.update()  # we update all pixels
+            
+            if points > record:
+                draw_text(font50, str(points), (0, 255, 0), Vector2(screen_width - 55, 50))
+                draw_text(font50, str(points), (0, 255, 0),
+                              Vector2(screen_width - 55, screen_height / 2 + 40))
+                new_record = True
 
-            elif result_change:
-                if points > record:
-                    draw_text(font50, str(points), (0, 255, 0), Vector2(screen.get_width() - 55, 50))
-                    draw_text(font50, str(points), (0, 255, 0),
-                              Vector2(screen.get_width() - 55, screen.get_height() / 2 + 40))
-                    new_record = True
-
-                else:
-                    draw_text(font50, str(record), (255, 255, 0), Vector2(screen.get_width() - 55, 50))
-                    draw_text(font50, str(points), (255, 255, 0),
-                              Vector2(screen.get_width() - 55, screen.get_height() / 2 + 40))
+            else:
+                draw_text(font50, str(record), (255, 255, 0), Vector2(screen_width - 55, 50))
+                draw_text(font50, str(points), (255, 255, 0),
+                              Vector2(screen_width - 55, screen_height / 2 + 40))
             
             
-            pygame.display.update(to_update)
+            # update all pixels
+            pygame.display.flip()
+            
             Tp = (time.time() - t1)
             
-            first_frame = 0
-
-
-plane_game()
+           

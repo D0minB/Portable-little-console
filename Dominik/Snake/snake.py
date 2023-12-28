@@ -1,23 +1,55 @@
 # SNAKE
 # AUTHOR: DOMINIK BOGIELCZYK
+
 import time
-from pygame.math import Vector2
-from random import randint
+import os
 import pygame
 import sys
+from pygame.math import Vector2
+from random import randint
 from collections import Counter
-from MCP3008_class import MCP3008
 import RPi.GPIO as GPIO
+from MCP3008_class import MCP3008
+sys.path.insert(0, '/home/pi/Desktop/main/menu')
+import menu
 
-adc = MCP3008()
-buzzer_pin = 37
+# Constants
+BUZZER_PIN = 37
+
+# Initialize GPIO
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(buzzer_pin, GPIO.OUT)
+GPIO.setup(BUZZER_PIN, GPIO.OUT)
+
+# Initialize MCP3008
+adc = MCP3008()
+
+# Pygame
+pygame.init()
+pygame.mouse.set_visible(0)
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+
+# Fonts 
+font20 = pygame.font.SysFont("dejavuserif", 20)
+font25 = pygame.font.SysFont("dejavuserif", 25)
+font30 = pygame.font.SysFont("dejavuserif", 30)
+font40 = pygame.font.SysFont("dejavuserif", 40)
+
+# GPIO
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+left_switch = 32
+right_switch = 33
+GPIO.setup(left_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(right_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+prev_val_4 = adc.read(channel=4)
+prev_val_5 = adc.read(channel=5)
 
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, orientation_, is_head=False, is_fruit=False):
+        os.chdir('/home/pi/Desktop/main/menu/Snake')
         super().__init__()
         self.orientation = orientation_
         if is_head == 0 and is_fruit == 0:
@@ -67,25 +99,6 @@ class Wall_part(pygame.sprite.Sprite):
         self.rect = screen.blit(self.image, (pos_x, pos_y))
 
 
-pygame.init()
-pygame.mouse.set_visible(0)
-screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-
-font20 = pygame.font.SysFont("dejavuserif", 20)
-font25 = pygame.font.SysFont("dejavuserif", 25)
-font30 = pygame.font.SysFont("dejavuserif", 30)
-font40 = pygame.font.SysFont("dejavuserif", 40)
-
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
-left_switch = 32
-right_switch = 33
-GPIO.setup(left_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(right_switch, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-prev_val_4 = adc.read(channel=4)
-prev_val_5 = adc.read(channel=5)
-
 
 def make_background():
     background = pygame.sprite.Group()
@@ -130,17 +143,6 @@ def start_screen(background):
 
 
 def end_screen(points, record):
-    buzzer = GPIO.PWM(buzzer_pin, 1000)
-    buzzer.start(50)
-    notes = [300, 200, 150, 100]
-    t = [0.2, 0.2, 0.2, 0.2]
-    
-    for i in range(len(notes)):
-        buzzer.ChangeFrequency(notes[i])
-        time.sleep(t[i])
-    
-    buzzer.stop()
-
     screen.fill((0, 0, 0))
     draw_text("Lewy przycisk - nowa gra", font20, (255, 255, 255), Vector2(screen.get_width() / 2, 230))
     draw_text("Prawy przycisk - koniec gry", font20, (255, 255, 255), Vector2(screen.get_width() / 2, 270))
@@ -160,14 +162,13 @@ def end_screen(points, record):
 
     while True:
         if GPIO.input(right_switch) == 0:
-            pygame.quit()
-            sys.exit()
+            menu.games()
         elif GPIO.input(left_switch) == 0:
             snake(False)
 
 
 def snake(start=True):
-    buzzer = GPIO.PWM(buzzer_pin, 1000)
+    buzzer = GPIO.PWM(BUZZER_PIN, 1000)
     t_buzzer = time.time()
     dt = 0.0
     fps = 6.0
@@ -175,8 +176,8 @@ def snake(start=True):
     points = 0
     direction = "left"
     lvl = 1
-    lvl_points = 0  # points at this level
-    next_level = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70]  # how many points to next lvl
+    lvl_points = 7  # points at this level
+    next_level = 10  # how many points to next lvl
     block_size = 20
     first_frame = True
 
@@ -208,7 +209,7 @@ def snake(start=True):
         t1 = time.time()
         if start:
             start_screen(background)
-        start = False
+            start = False
         t2 = time.time()
 
         dt -= t2 - t1
@@ -246,15 +247,10 @@ def snake(start=True):
                 end_screen(points, record)
 
             # Update snake after movement
-            i = 0
-            for obj in snake_body_group:
+            for i, obj in enumerate(snake_body_group):
                 obj.orientation = orientation[i]
-                if orientation[i] == "left" or orientation[i] == "right":
-                    obj.image = obj.image_h
-                else:
-                    obj.image = obj.image_v
+                obj.image = obj.image_h if orientation[i] in {"left", "right"} else obj.image_v
                 obj.rect = screen.blit(obj.image, (pos[i].x, pos[i].y))
-                i += 1
 
             # GAME END
             for head in snake_head_group:
@@ -291,13 +287,15 @@ def snake(start=True):
 
             
             # NEXT LEVEL
-            if lvl_points >= next_level[lvl - 1]:
+            if lvl_points >= next_level:
+                next_level += 5
+                first_frame = True
                 lvl += 1
                 lvl_points = 0
                 
                 draw_text("Punkty:  " + str(points), font25, color, Vector2(80, 20))
                 draw_text("Rekord:  " + str(record_info), font20, color, Vector2(230, 20))
-                draw_text("Poziom " + str(lvl) + ":   " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font20,
+                draw_text("Poziom " + str(lvl) + ":   " + str(lvl_points) + "/" + str(next_level), font20,
                           color, Vector2((screen.get_width() - 90, 20)))
                 draw_text("POZIOM " + str(lvl), font30, (255, 0, 0), Vector2(screen.get_width() / 2, 75))
 
@@ -314,14 +312,11 @@ def snake(start=True):
                 fps += 1.0
 
                 # SNAKE RETURN TO SIZE = 4
-                i = 0
-                for obj in snake_body_group:
+                for i, obj in enumerate(snake_body_group):
                     if i >= 3:
                         snake_body_group.remove(obj)
-                    i += 1
-
-                first_frame = True
-                
+                        
+                 
             screen.fill((0, 0, 0))
             background.draw(screen)
             snake_head_group.update(direction, block_size)
@@ -342,10 +337,11 @@ def snake(start=True):
             if first_frame or result_changed:
                 draw_text("Punkty:  " + str(points), font25, color, Vector2(80, 20))
                 draw_text("Rekord:  " + str(record_info), font20, color, Vector2(230, 20))
-                draw_text("Poziom " + str(lvl) + ":   " + str(lvl_points) + "/" + str(next_level[lvl - 1]), font20,
+                draw_text("Poziom " + str(lvl) + ":   " + str(lvl_points) + "/" + str(next_level), font20,
                           color, Vector2((screen.get_width() - 90, 20)))
 
             if first_frame:
+                first_frame = False
                 fruit_group.draw(screen)
                 pygame.display.update()
             else:
@@ -358,7 +354,5 @@ def snake(start=True):
                 # last snake part update
                 pygame.display.update(pygame.Rect(pos[len(pos) - 1].x, pos[len(pos) - 1].y, 20, 20))
 
-            first_frame = False
+            
 
-
-snake()

@@ -6,6 +6,10 @@
   <img  width="709" height="457" src="https://github.com/DominikBogielczyk/Portable-little-console/blob/main/Konsola.png">
 </p> </p>
 
+# Video
+[![Watch the video](https://i.imgur.com/Tk2vuCm.png)](https://www.youtube.com/watch?v=dXiB_K7JEA8)
+
+
 # KN RAI project
  
  **Authors**:

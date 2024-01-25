@@ -30,6 +30,8 @@
  - Hunter 🦆 🔫
  - Maze 🕹️ 📐
   <br /> <br />
-  
+
+  # Diagram
+  ![Diagram](./diagram.jpg)
 
 
